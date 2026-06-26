@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "detectedAt": "2026-06-26T22:10:43Z",
+  "environment": {
+    "hasGitHubRemote": true,
+    "defaultBranch": "main"
+  },
+  "qualityGates": {
+    "typecheck": null,
+    "test": null,
+    "build": null,
+    "lint": null
+  },
+  "tasks": {
+    "tasksFile": "docs/TASKS.md"
+  },
+  "skills": {
+    "review": "code-review",
+    "reviseClaudeMd": "claude-md-management:revise-claude-md",
+    "tasksDone": "tasks:tasks-done",
+    "commitPushPr": "commit-commands:commit-push-pr"
+  }
+}
