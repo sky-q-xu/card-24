@@ -1,11 +1,38 @@
 extends Node2D
 
-@export var CARD_SCENE: PackedScene
-@onready var operator_popup: OperatorPopup = $OperatorPopup
+const CARD_SCENE = preload("res://scenes/card.tscn")
+
+@onready var operator_popup: OperatorPopup = $UILayer/OperatorPopup
+@onready var _card_slots: Node2D = $GameBoard/CardSlots
 
 var _live_cards: Array = []
 
-signal _merge_resolved(op: String)  # "" = cancelled, else the operator string
+signal _merge_resolved(op: String)
+
+func _ready() -> void:
+	GameManager.round_started.connect(_on_round_started)
+	GameManager.game_won.connect(_on_game_won)
+	GameManager.game_lost.connect(_on_game_lost)
+	GameManager.deal_new_round()
+
+func _on_round_started(card_data: Array) -> void:
+	for card in _live_cards:
+		card.queue_free()
+	_live_cards.clear()
+	var slots := _card_slots.get_children()
+	for i in range(card_data.size()):
+		var c: Card = CARD_SCENE.instantiate()
+		c.setup(card_data[i].value, card_data[i].display, card_data[i].suit)
+		c.global_position = slots[i].global_position
+		c.dropped_on.connect(_on_card_dropped_on)
+		add_child(c)
+		_live_cards.append(c)
+
+func _on_game_won() -> void:
+	pass  # WinScreen wired here later
+
+func _on_game_lost() -> void:
+	pass  # LoseScreen wired here later
 
 func _on_card_dropped_on(source: Card, target: Card) -> void:
 	_set_cards_interactive(false)
@@ -36,7 +63,7 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 	var merged: Card = CARD_SCENE.instantiate()
 	merged.setup(result, _format_value(result), 0)
 	merged.global_position = target.global_position
-	get_parent().add_child(merged)
+	add_child(merged)
 	merged.dropped_on.connect(_on_card_dropped_on)
 
 	_live_cards.remove_at(hi)
@@ -50,17 +77,16 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 	_set_cards_interactive(true)
 
 func _apply_op(a: float, b: float, op: String) -> Variant:
-	if op == "*":
-		return a * b
-	if op == "-":
-		return a - b
 	if op == "+":
 		return a + b
+	if op == "-":
+		return a - b
+	if op == "*":
+		return a * b
 	if op == "/":
 		if b == 0.0:
 			return null
 		return a / b
-		
 	return null
 
 func _card_index(card: Card) -> int:

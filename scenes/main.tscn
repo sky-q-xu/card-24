@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/operator_popup.tscn" id="2"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1")
+
+[node name="GameBoard" type="Node2D" parent="."]
+
+[node name="CardSlots" type="Node2D" parent="GameBoard"]
+
+[node name="Slot0" type="Marker2D" parent="GameBoard/CardSlots"]
+position = Vector2(246, 234)
+
+[node name="Slot1" type="Marker2D" parent="GameBoard/CardSlots"]
+position = Vector2(426, 234)
+
+[node name="Slot2" type="Marker2D" parent="GameBoard/CardSlots"]
+position = Vector2(606, 234)
+
+[node name="Slot3" type="Marker2D" parent="GameBoard/CardSlots"]
+position = Vector2(786, 234)
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="OperatorPopup" parent="UILayer" instance=ExtResource("2")]
