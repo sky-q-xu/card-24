@@ -69,15 +69,15 @@ Dependency list (a task is executable when all its deps are `[x]` done):
 ### Phase 1: Foundation
 > Goal: Godot project bootstrapped with core scenes and the game state singleton.
 
-- [ ] [Project setup](tasks/project-setup.md)
-- [ ] [Card scene](tasks/card-scene.md)
-- [ ] [GameManager autoload](tasks/game-manager.md)
-- [ ] [Operator popup](tasks/operator-popup.md)
+- [x] [Project setup](tasks/project-setup.md)
+- [x] [Card scene](tasks/card-scene.md)
+- [x] [GameManager autoload](tasks/game-manager.md)
+- [x] [Operator popup](tasks/operator-popup.md)
 
 ### Phase 2: Core Gameplay
 > Goal: drag-and-drop merge loop works end-to-end in isolation.
 
-- [ ] [Card drag-and-drop](tasks/drag-and-drop.md)
+- [x] [Card drag-and-drop](tasks/drag-and-drop.md)
 - [ ] [Card merge](tasks/card-merge.md)
 
 ### Phase 3: Game Loop & Polish
