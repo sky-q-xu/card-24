@@ -11,8 +11,6 @@ signal _merge_resolved(op: String)
 
 func _ready() -> void:
 	GameManager.round_started.connect(_on_round_started)
-	GameManager.game_won.connect(_on_game_won)
-	GameManager.game_lost.connect(_on_game_lost)
 	GameManager.deal_new_round()
 
 func _on_round_started(card_data: Array) -> void:
@@ -27,12 +25,6 @@ func _on_round_started(card_data: Array) -> void:
 		c.dropped_on.connect(_on_card_dropped_on)
 		add_child(c)
 		_live_cards.append(c)
-
-func _on_game_won() -> void:
-	pass  # WinScreen wired here later
-
-func _on_game_lost() -> void:
-	pass  # LoseScreen wired here later
 
 func _on_card_dropped_on(source: Card, target: Card) -> void:
 	_set_cards_interactive(false)

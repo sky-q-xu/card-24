@@ -1,8 +1,10 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/operator_popup.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/screens/win_screen.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scenes/screens/lose_screen.tscn" id="5"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
@@ -28,3 +30,7 @@ position = Vector2(786, 234)
 [node name="OperatorPopup" parent="UILayer" instance=ExtResource("2")]
 
 [node name="HUD" parent="." instance=ExtResource("3")]
+
+[node name="WinScreen" parent="." instance=ExtResource("4")]
+
+[node name="LoseScreen" parent="." instance=ExtResource("5")]

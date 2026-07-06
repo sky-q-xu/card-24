@@ -1,0 +1,30 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/lose_screen.gd" id="1"]
+
+[node name="LoseScreen" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Not 24."
+horizontal_alignment = 1
+
+[node name="NewDeal" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "New Deal"
+
+[connection signal="pressed" from="CenterContainer/VBoxContainer/NewDeal" to="." method="_on_new_deal_pressed"]
