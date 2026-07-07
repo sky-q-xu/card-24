@@ -53,7 +53,7 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 	var lo := mini(idx_a, idx_b)
 
 	var merged: Card = CARD_SCENE.instantiate()
-	merged.setup(result, _format_value(result), 0)
+	merged.setup(result, GameManager.format_value(result), 0)
 	merged.global_position = target.global_position
 	add_child(merged)
 	merged.dropped_on.connect(_on_card_dropped_on)
@@ -87,8 +87,3 @@ func _card_index(card: Card) -> int:
 func _set_cards_interactive(enabled: bool) -> void:
 	for card in _live_cards:
 		card.input_enabled = enabled
-
-func _format_value(v: float) -> String:
-	if v == floorf(v):
-		return str(int(v))
-	return str(v)

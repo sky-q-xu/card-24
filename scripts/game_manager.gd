@@ -10,7 +10,7 @@ var cards: Array = []
 var round: int = 0
 var score: int = 0
 
-func deal_new_round() -> void:
+func deal_new_round(increment_round: bool = true) -> void:
 	var vals := _pick_four()
 	if ENSURE_SOLVABLE:
 		var tries := 0
@@ -24,7 +24,8 @@ func deal_new_round() -> void:
 			"display": _value_to_display(v),
 			"suit": randi_range(0, 3)
 		})
-	round += 1
+	if increment_round:
+		round += 1
 	emit_signal("round_started", cards.duplicate())
 
 func _pick_four() -> Array:
@@ -39,7 +40,7 @@ func on_merge(idx_a: int, idx_b: int, result: float) -> void:
 
 	cards.remove_at(hi)
 	cards.remove_at(lo)
-	cards.append({ "value": result, "display": _format_value(result), "suit": 0 })
+	cards.append({ "value": result, "display": format_value(result), "suit": 0 })
 
 	if len(cards) == 1:
 		if abs(cards[0].value - 24.0) < 0.0001:
@@ -57,7 +58,32 @@ func _value_to_display(v: int) -> String:
 		13: return "K"
 		_: return str(v)
 
-func _format_value(v: float) -> String:
-	if v == floorf(v):
-		return str(int(v))
+func format_value(v: float) -> String:
+	if absf(v - roundf(v)) < 1e-9:
+		return str(int(roundf(v)))
+	var sign_str := "-" if v < 0.0 else ""
+	var abs_v := absf(v)
+	for d in range(2, 10001):
+		var n := roundi(abs_v * d)
+		if absf(float(n) / float(d) - abs_v) < 1e-9:
+			var g := _gcd(n, d)
+			var num := n / g
+			var den := d / g
+			var rem := den
+			while rem % 2 == 0: rem /= 2
+			while rem % 5 == 0: rem /= 5
+			if rem != 1:
+				if num > den:
+					var whole := num / den
+					var numer := num % den
+					return "%s%d %d/%d" % [sign_str, whole, numer, den]
+				return "%s%d/%d" % [sign_str, num, den]
+			break
 	return str(v)
+
+func _gcd(a: int, b: int) -> int:
+	while b != 0:
+		var t := b
+		b = a % b
+		a = t
+	return a
