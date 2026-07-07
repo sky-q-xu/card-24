@@ -33,6 +33,7 @@ func on_merge(idx_a: int, idx_b: int, result: float) -> void:
 			score += 1
 			emit_signal("game_won")
 		else:
+			score -= 1
 			emit_signal("game_lost")
 
 func _value_to_display(v: int) -> String:
