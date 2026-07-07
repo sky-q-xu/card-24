@@ -1,17 +1,24 @@
 extends Node
-#signals
+
+const ENSURE_SOLVABLE := true
+
 signal round_started(card_data: Array)
 signal game_won
 signal game_lost
-#variables
-var cards: Array = []		#will be cards dealed
-var round: int = 0 #starts on round 0
-var score: int = 0 #sets score at start to 0
+
+var cards: Array = []
+var round: int = 0
+var score: int = 0
 
 func deal_new_round() -> void:
-	cards = []		#resets hand
-	for i in 4: #counts how many cards are still needed
-		var v := randi_range(1, 13) #
+	var vals := _pick_four()
+	if ENSURE_SOLVABLE:
+		var tries := 0
+		while not Solver.can_reach_24(vals) and tries < 100:
+			vals = _pick_four()
+			tries += 1
+	cards = []
+	for v in vals:
 		cards.append({
 			"value": float(v),
 			"display": _value_to_display(v),
@@ -19,6 +26,12 @@ func deal_new_round() -> void:
 		})
 	round += 1
 	emit_signal("round_started", cards.duplicate())
+
+func _pick_four() -> Array:
+	var vals := []
+	for i in 4:
+		vals.append(randi_range(1, 13))
+	return vals
 
 func on_merge(idx_a: int, idx_b: int, result: float) -> void:
 	var hi := maxi(idx_a, idx_b)
