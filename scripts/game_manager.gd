@@ -1,6 +1,6 @@
 extends Node
 
-const ENSURE_SOLVABLE := true
+var ensure_solvable: bool = false
 
 signal round_started(card_data: Array)
 signal game_won
@@ -12,7 +12,7 @@ var score: int = 0
 
 func deal_new_round(increment_round: bool = true) -> void:
 	var vals := _pick_four()
-	if ENSURE_SOLVABLE:
+	if ensure_solvable:
 		var tries := 0
 		while not Solver.can_reach_24(vals) and tries < 100:
 			vals = _pick_four()
@@ -60,7 +60,13 @@ func _value_to_display(v: int) -> String:
 
 func format_value(v: float) -> String:
 	if absf(v - roundf(v)) < 1e-9:
-		return str(int(roundf(v)))
+		var i := int(roundf(v))
+		match i:
+			1: return "A"
+			11: return "J"
+			12: return "Q"
+			13: return "K"
+		return str(i)
 	var sign_str := "-" if v < 0.0 else ""
 	var abs_v := absf(v)
 	for d in range(2, 10001):
