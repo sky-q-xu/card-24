@@ -22,7 +22,7 @@ text = "Round: 1"
 [node name="ScoreLabel" type="Label" parent="GridContainer" unique_id=1836739568]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 36
 text = "Score: 0"
 horizontal_alignment = 1
 
@@ -36,6 +36,7 @@ text = "New Deal"
 [node name="SolvableToggle" type="CheckButton" parent="GridContainer" unique_id=1587994574]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 36
 custom_minimum_size = Vector2(200, 60)
 text = "Solvable: OFF"
 vertical_icon_alignment = 0
