@@ -7,7 +7,7 @@ signal game_won
 signal game_lost
 
 var cards: Array = []
-var round: int = 0
+var round: int = 1
 var score: int = 0
 
 func deal_new_round(increment_round: bool = true) -> void:

@@ -11,7 +11,7 @@ signal _merge_resolved(op: String)
 
 func _ready() -> void:
 	GameManager.round_started.connect(_on_round_started)
-	GameManager.deal_new_round()
+	GameManager.deal_new_round(false)
 
 func _on_round_started(card_data: Array) -> void:
 	for card in _live_cards:

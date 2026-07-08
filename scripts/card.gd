@@ -17,11 +17,25 @@ func setup(v: float, d: String, s: int) -> void:
 	display = d
 	suit = s
 	$Panel/Label.text = d
-	match s:
-		1, 2:
-			modulate = Color(1.0, 0.7, 0.7)
-		_:
-			modulate = Color.WHITE
+	modulate = _color_for_value(v)
+
+func _color_for_value(v: float) -> Color:
+	match int(v) if absf(v - roundf(v)) < 1e-9 else -1:
+		1:  return Color(1.0, 0.85, 0.3)   # A  — gold
+		2:  return Color(0.5, 0.85, 0.5)   # 2  — green
+		3:  return Color(1.0, 0.5,  0.4)   # 3  — coral
+		4:  return Color(0.4, 0.7,  1.0)   # 4  — sky blue
+		5:  return Color(0.75, 0.5, 1.0)   # 5  — purple
+		6:  return Color(0.3, 0.8,  0.8)   # 6  — teal
+		7:  return Color(1.0, 0.6,  0.8)   # 7  — pink
+		8:  return Color(0.4, 0.5,  0.9)   # 8  — indigo
+		9:  return Color(1.0, 0.65, 0.3)   # 9  — orange
+		10: return Color(0.6, 0.9,  0.4)   # 10 — lime
+		11: return Color(1.0, 0.4,  0.8)   # J  — magenta
+		12: return Color(0.3, 0.9,  0.9)   # Q  — cyan
+		13: return Color(0.9, 0.3,  0.3)   # K  — red
+		24: return Color(1.0, 0.9,  0.0)   # 24 — bright gold
+		_:  return Color(0.85, 0.85, 0.85) # merged result — light grey
 
 func _is_mouse_over() -> bool:
 	var rect = $Panel.get_global_rect()
