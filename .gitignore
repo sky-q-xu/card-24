@@ -1,5 +1,14 @@
 # Claude Code local settings (machine-specific)
 .claude/settings.local.json
 
+# Godot cache
+.godot/
+
+# Editor scratch folders
+Untitled/
+
+# Claude Code local settings
+.claude/settings.json
+
 # macOS
 .DS_Store

@@ -28,9 +28,15 @@ position = Vector2(786, 234)
 [node name="UILayer" type="CanvasLayer" parent="."]
 
 [node name="OperatorPopup" parent="UILayer" instance=ExtResource("2")]
+layout_mode = 3
+anchors_preset = 0
 
 [node name="HUD" parent="." instance=ExtResource("3")]
 
 [node name="WinScreen" parent="." instance=ExtResource("4")]
+offset = Vector2(-550, -200)
+transform = Transform2D(1, 0, 0, 1, -550, -200)
 
 [node name="LoseScreen" parent="." instance=ExtResource("5")]
+offset = Vector2(-550, -200)
+transform = Transform2D(1, 0, 0, 1, -550, -200)
