@@ -33,13 +33,12 @@ custom_minimum_size = Vector2(200, 60)
 theme_override_font_sizes/font_size = 36
 text = "New Deal"
 
-[node name="SolvableToggle" type="CheckButton" parent="GridContainer" unique_id=1587994574]
+[node name="SolvableToggle" type="Button" parent="GridContainer" unique_id=1587994574]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 36
 custom_minimum_size = Vector2(200, 60)
 text = "Solvable: OFF"
-vertical_icon_alignment = 0
 
 [connection signal="pressed" from="GridContainer/NewDeal" to="." method="_on_new_deal_pressed"]
-[connection signal="toggled" from="GridContainer/SolvableToggle" to="." method="_on_solvable_toggled"]
+[connection signal="pressed" from="GridContainer/SolvableToggle" to="." method="_on_solvable_toggled"]
