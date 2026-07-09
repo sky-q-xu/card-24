@@ -28,11 +28,11 @@ func _color_for_value(v: float) -> Color:
 		5:  return Color(0.75, 0.5, 1.0)   # 5  — purple
 		6:  return Color(0.3, 0.8,  0.8)   # 6  — teal
 		7:  return Color(1.0, 0.6,  0.8)   # 7  — pink
-		8:  return Color(0.4, 0.5,  0.9)   # 8  — indigo
+		8:  return Color(0.15, 0.2,0.53)   # 8  — dark blue
 		9:  return Color(1.0, 0.65, 0.3)   # 9  — orange
 		10: return Color(0.6, 0.9,  0.4)   # 10 — lime
 		11: return Color(1.0, 0.4,  0.8)   # J  — magenta
-		12: return Color(0.3, 0.9,  0.9)   # Q  — cyan
+		12: return Color(0.125,0.55,0.55)   # Q  — dark teal
 		13: return Color(0.9, 0.3,  0.3)   # K  — red
 		24: return Color(1.0, 0.9,  0.0)   # 24 — bright gold
 		_:  return Color(0.85, 0.85, 0.85) # merged result — light grey

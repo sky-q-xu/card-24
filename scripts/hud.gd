@@ -9,7 +9,7 @@ func _ready() -> void:
 	GameManager.game_won.connect(_on_game_won)
 
 func _on_round_started(_cards: Array) -> void:
-	round_label.text = "Round: %d" % GameManager.round
+	round_label.text = "                       Round: %d" % GameManager.round
 	score_label.text = "Score: %d" % GameManager.score
 
 func _on_game_won() -> void:

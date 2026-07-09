@@ -15,8 +15,15 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Card-24"
-run/main_scene="uid://biwkfcpjw0qfl"
+run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.6")
+
+[display]
+
+window/size/viewport_width=1152
+window/size/viewport_height=648
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
 
 [autoload]
 

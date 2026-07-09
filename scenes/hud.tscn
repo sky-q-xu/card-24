@@ -13,11 +13,11 @@ grow_horizontal = 2
 columns = 2
 
 [node name="RoundLabel" type="Label" parent="GridContainer" unique_id=2090576829]
+custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(200, 60)
 theme_override_font_sizes/font_size = 36
-text = "Round: 1"
+text = "                       Round: 1"
 
 [node name="ScoreLabel" type="Label" parent="GridContainer" unique_id=1836739568]
 layout_mode = 2
@@ -27,17 +27,17 @@ text = "Score: 0"
 horizontal_alignment = 1
 
 [node name="NewDeal" type="Button" parent="GridContainer" unique_id=1990179486]
+custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(200, 60)
 theme_override_font_sizes/font_size = 36
 text = "New Deal"
 
 [node name="SolvableToggle" type="Button" parent="GridContainer" unique_id=1587994574]
+custom_minimum_size = Vector2(200, 60)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 36
-custom_minimum_size = Vector2(200, 60)
 text = "Solvable: OFF"
 
 [connection signal="pressed" from="GridContainer/NewDeal" to="." method="_on_new_deal_pressed"]
