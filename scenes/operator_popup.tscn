@@ -42,7 +42,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "÷"
 
+[node name="ButtonCancel" type="Button" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Cancel"
+
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonPlus" to="." method="_on_button_pressed" binds=["+"]]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonMinus" to="." method="_on_button_pressed" binds=["-"]]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonMul" to="." method="_on_button_pressed" binds=["*"]]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonDiv" to="." method="_on_button_pressed" binds=["/"]]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/ButtonCancel" to="." method="_on_cancel_pressed"]
