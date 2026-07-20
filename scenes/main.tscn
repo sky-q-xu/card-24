@@ -1,10 +1,13 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/operator_popup.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/screens/win_screen.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/screens/lose_screen.tscn" id="5"]
+
+[sub_resource type="StyleBoxFlat" id="6"]
+bg_color = Color(1, 1, 1, 1)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
@@ -33,32 +36,20 @@ offset_left = 10.0
 offset_top = 10.0
 offset_right = 130.0
 offset_bottom = 190.0
-modulate = Color(0.16, 0.22, 0.45, 1)
+theme_override_styles/panel = SubResource("6")
 
 [node name="Layer1" type="Panel" parent="GameBoard/Deck"]
 offset_left = 5.0
 offset_top = 5.0
 offset_right = 125.0
 offset_bottom = 185.0
-modulate = Color(0.16, 0.22, 0.45, 1)
+theme_override_styles/panel = SubResource("6")
 
 [node name="Layer0" type="Panel" parent="GameBoard/Deck"]
 offset_right = 120.0
 offset_bottom = 180.0
-modulate = Color(0.16, 0.22, 0.45, 1)
+theme_override_styles/panel = SubResource("6")
 
-[node name="Label" type="Label" parent="GameBoard/Deck/Layer0"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 40
-theme_override_colors/font_color = Color(1, 0.9, 0, 1)
-text = "24"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 
