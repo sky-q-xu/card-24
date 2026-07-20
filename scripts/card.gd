@@ -11,6 +11,7 @@ var input_enabled: bool = true
 var _dragging: bool = false
 var _drag_offset: Vector2
 var _original_position: Vector2
+var _original_rotation: float
 
 func setup(v: float, d: String, s: int) -> void:
 	value = v
@@ -62,6 +63,7 @@ func _input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed and _is_mouse_over():
 				_original_position = global_position
+				_original_rotation = rotation
 				_dragging = true
 				_drag_offset = global_position - event.global_position
 				z_index = 10
@@ -81,3 +83,4 @@ func _check_drop() -> void:
 			emit_signal("dropped_on", self, target)
 			return
 	global_position = _original_position
+	rotation = _original_rotation

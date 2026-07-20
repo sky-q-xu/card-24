@@ -8,6 +8,8 @@ const CARD_SCENE = preload("res://scenes/card.tscn")
 
 const DEAL_STAGGER := 0.12
 const DEAL_DURATION := 0.35
+const JITTER_POS := 10.0
+const JITTER_ROT := 0.12
 
 var _live_cards: Array = []
 
@@ -37,11 +39,18 @@ func _on_round_started(card_data: Array) -> void:
 const FLIP_DURATION := 0.12
 
 func _animate_deal(card: Card, target_position: Vector2, index: int) -> void:
+	var final_pos := target_position + Vector2(
+		randf_range(-JITTER_POS, JITTER_POS),
+		randf_range(-JITTER_POS, JITTER_POS)
+	)
+	var final_rot := randf_range(-JITTER_ROT, JITTER_ROT)
 	var tween := create_tween()
 	tween.tween_interval(index * DEAL_STAGGER)
-	tween.tween_property(card, "global_position", target_position, DEAL_DURATION) \
+	tween.tween_property(card, "global_position", final_pos, DEAL_DURATION) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(card, "scale", Vector2.ONE, DEAL_DURATION) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(card, "rotation", final_rot, DEAL_DURATION) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.tween_property(card, "scale:x", 0.0, FLIP_DURATION) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
