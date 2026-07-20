@@ -12,6 +12,14 @@ var _dragging: bool = false
 var _drag_offset: Vector2
 var _original_position: Vector2
 var _original_rotation: float
+var _velocity: Vector2 = Vector2.ZERO
+var _prev_mouse_pos: Vector2 = Vector2.ZERO
+var _gliding: bool = false
+
+const FRICTION := 0.88
+const BOUNCE := 0.25
+const CARD_W := 120.0
+const CARD_H := 180.0
 
 func setup(v: float, d: String, s: int) -> void:
 	value = v
@@ -65,6 +73,9 @@ func _input(event: InputEvent) -> void:
 				_original_position = global_position
 				_original_rotation = rotation
 				_dragging = true
+				_gliding = false
+				_velocity = Vector2.ZERO
+				_prev_mouse_pos = event.global_position
 				_drag_offset = global_position - event.global_position
 				z_index = 10
 			else:
@@ -74,7 +85,36 @@ func _input(event: InputEvent) -> void:
 					_check_drop()
 
 	if event is InputEventMouseMotion and _dragging:
+		_velocity = event.global_position - _prev_mouse_pos
+		_prev_mouse_pos = event.global_position
 		global_position = event.global_position + _drag_offset
+
+func _process(_delta: float) -> void:
+	if not _gliding:
+		return
+	global_position += _velocity
+	_velocity *= FRICTION
+	_clamp_to_walls()
+	if _velocity.length_squared() < 0.25:
+		_gliding = false
+		_velocity = Vector2.ZERO
+
+func _clamp_to_walls() -> void:
+	var vp := get_viewport_rect().size
+	var pos := global_position
+	if pos.x < 0.0:
+		pos.x = 0.0
+		_velocity.x = absf(_velocity.x) * BOUNCE
+	elif pos.x + CARD_W > vp.x:
+		pos.x = vp.x - CARD_W
+		_velocity.x = -absf(_velocity.x) * BOUNCE
+	if pos.y < 0.0:
+		pos.y = 0.0
+		_velocity.y = absf(_velocity.y) * BOUNCE
+	elif pos.y + CARD_H > vp.y:
+		pos.y = vp.y - CARD_H
+		_velocity.y = -absf(_velocity.y) * BOUNCE
+	global_position = pos
 
 func _check_drop() -> void:
 	for area in $Area2D.get_overlapping_areas():
@@ -82,5 +122,4 @@ func _check_drop() -> void:
 		if target != self and target is Card:
 			emit_signal("dropped_on", self, target)
 			return
-	global_position = _original_position
-	rotation = _original_rotation
+	_gliding = true
