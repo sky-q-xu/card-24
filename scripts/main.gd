@@ -81,6 +81,11 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 		_set_cards_interactive(true)
 		return
 
+	var slide := create_tween()
+	slide.tween_property(source, "global_position", target.global_position, 0.18) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	await slide.finished
+
 	var idx_a := _card_index(source)
 	var idx_b := _card_index(target)
 	var hi := maxi(idx_a, idx_b)
@@ -89,7 +94,9 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 	var merged: Card = CARD_SCENE.instantiate()
 	merged.setup(result, GameManager.format_value(result), 0)
 	merged.global_position = target.global_position
+	merged.rotation = target.rotation
 	add_child(merged)
+	merged.show_as_merged(op)
 	merged.dropped_on.connect(_on_card_dropped_on)
 
 	_live_cards.remove_at(hi)

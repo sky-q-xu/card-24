@@ -45,6 +45,14 @@ func reveal_face() -> void:
 	$Panel.add_theme_stylebox_override("panel", _make_style(_color_for_value(value)))
 	$Panel/Label.visible = true
 
+const _OP_SYMBOL := {"+": "+", "-": "−", "*": "×", "/": "÷"}
+
+func show_as_merged(op: String) -> void:
+	$StackLayer1.visible = true
+	$StackLayer0.visible = true
+	$OperatorBadge/OperatorLabel.text = _OP_SYMBOL.get(op, op)
+	$OperatorBadge.visible = true
+
 func _color_for_value(v: float) -> Color:
 	match int(v) if absf(v - roundf(v)) < 1e-9 else -1:
 		1:  return Color(1.0, 0.85, 0.3)   # A  — gold
