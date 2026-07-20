@@ -21,6 +21,18 @@ func setup(v: float, d: String, s: int) -> void:
 	style.bg_color = _color_for_value(v)
 	$Panel.add_theme_stylebox_override("panel", style)
 
+func set_face_down() -> void:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(1, 1, 1, 1)
+	$Panel.add_theme_stylebox_override("panel", style)
+	$Panel/Label.visible = false
+
+func reveal_face() -> void:
+	var style := StyleBoxFlat.new()
+	style.bg_color = _color_for_value(value)
+	$Panel.add_theme_stylebox_override("panel", style)
+	$Panel/Label.visible = true
+
 func _color_for_value(v: float) -> Color:
 	match int(v) if absf(v - roundf(v)) < 1e-9 else -1:
 		1:  return Color(1.0, 0.85, 0.3)   # A  — gold

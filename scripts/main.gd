@@ -25,6 +25,7 @@ func _on_round_started(card_data: Array) -> void:
 	for i in range(card_data.size()):
 		var c: Card = CARD_SCENE.instantiate()
 		c.setup(card_data[i].value, card_data[i].display, card_data[i].suit)
+		c.set_face_down()
 		c.global_position = _deck.global_position
 		c.scale = Vector2(0.6, 0.6)
 		c.input_enabled = false
@@ -33,6 +34,8 @@ func _on_round_started(card_data: Array) -> void:
 		_live_cards.append(c)
 		_animate_deal(c, slots[i].global_position, i)
 
+const FLIP_DURATION := 0.12
+
 func _animate_deal(card: Card, target_position: Vector2, index: int) -> void:
 	var tween := create_tween()
 	tween.tween_interval(index * DEAL_STAGGER)
@@ -40,6 +43,11 @@ func _animate_deal(card: Card, target_position: Vector2, index: int) -> void:
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(card, "scale", Vector2.ONE, DEAL_DURATION) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(card, "scale:x", 0.0, FLIP_DURATION) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	tween.tween_callback(func(): card.reveal_face())
+	tween.tween_property(card, "scale:x", 1.0, FLIP_DURATION) \
+		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_callback(func(): card.input_enabled = true)
 
 func _on_card_dropped_on(source: Card, target: Card) -> void:
