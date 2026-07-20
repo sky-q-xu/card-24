@@ -2,7 +2,7 @@ extends Node2D
 
 const CARD_SCENE = preload("res://scenes/card.tscn")
 
-@onready var operator_popup: OperatorPopup = $UILayer/OperatorPopup
+@onready var operator_bar = $OperatorBar
 @onready var _card_slots: Node2D = $GameBoard/CardSlots
 @onready var _deck: Node2D = $GameBoard/Deck
 
@@ -61,22 +61,23 @@ func _animate_deal(card: Card, target_position: Vector2, index: int) -> void:
 
 func _on_card_dropped_on(source: Card, target: Card) -> void:
 	_set_cards_interactive(false)
-	var mid := (source.global_position + target.global_position) / 2.0
-	operator_popup.show_at(mid)
+	operator_bar.activate()
 
 	@warning_ignore("confusable_local_declaration")
-	operator_popup.operator_selected.connect(func(op): _merge_resolved.emit(op), CONNECT_ONE_SHOT)
-	operator_popup.cancelled.connect(func(): _merge_resolved.emit(""), CONNECT_ONE_SHOT)
+	operator_bar.operator_selected.connect(func(op): _merge_resolved.emit(op), CONNECT_ONE_SHOT)
+	operator_bar.cancelled.connect(func(): _merge_resolved.emit(""), CONNECT_ONE_SHOT)
 
 	var op: String = await _merge_resolved
 
 	if op == "":
 		source.global_position = source._original_position
+		source.rotation = source._original_rotation
 		_set_cards_interactive(true)
 		return
 
 	var result = _apply_op(source.value, target.value, op)
 	if result == null:
+		operator_bar.deactivate()
 		_set_cards_interactive(true)
 		return
 

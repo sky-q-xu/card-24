@@ -21,25 +21,28 @@ const BOUNCE := 0.25
 const CARD_W := 120.0
 const CARD_H := 180.0
 
+func _make_style(color: Color) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = color
+	s.corner_radius_top_left = 16
+	s.corner_radius_top_right = 16
+	s.corner_radius_bottom_left = 16
+	s.corner_radius_bottom_right = 16
+	return s
+
 func setup(v: float, d: String, s: int) -> void:
 	value = v
 	display = d
 	suit = s
 	$Panel/Label.text = d
-	var style := StyleBoxFlat.new()
-	style.bg_color = _color_for_value(v)
-	$Panel.add_theme_stylebox_override("panel", style)
+	$Panel.add_theme_stylebox_override("panel", _make_style(_color_for_value(v)))
 
 func set_face_down() -> void:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1, 1, 1, 1)
-	$Panel.add_theme_stylebox_override("panel", style)
+	$Panel.add_theme_stylebox_override("panel", _make_style(Color(1, 1, 1, 1)))
 	$Panel/Label.visible = false
 
 func reveal_face() -> void:
-	var style := StyleBoxFlat.new()
-	style.bg_color = _color_for_value(value)
-	$Panel.add_theme_stylebox_override("panel", style)
+	$Panel.add_theme_stylebox_override("panel", _make_style(_color_for_value(value)))
 	$Panel/Label.visible = true
 
 func _color_for_value(v: float) -> Color:
