@@ -96,8 +96,15 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 	merged.global_position = target.global_position
 	merged.rotation = target.rotation
 	add_child(merged)
-	merged.show_as_merged(op)
+	merged.show_as_merged(
+		op,
+		{"value": source.value, "display": source.display, "suit": source.suit},
+		source._original_position, source._original_rotation,
+		{"value": target.value, "display": target.display, "suit": target.suit},
+		target.global_position, target.rotation
+	)
 	merged.dropped_on.connect(_on_card_dropped_on)
+	merged.unmerged.connect(_on_card_unmerged)
 
 	_live_cards.remove_at(hi)
 	_live_cards.remove_at(lo)
@@ -107,6 +114,33 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 	target.queue_free()
 
 	GameManager.on_merge(idx_a, idx_b, result)
+	_set_cards_interactive(true)
+
+func _on_card_unmerged(merged: Card) -> void:
+	var merged_idx := _card_index(merged)
+
+	var card_a: Card = CARD_SCENE.instantiate()
+	card_a.setup(merged._merge_source_data.value, merged._merge_source_data.display, merged._merge_source_data.suit)
+	card_a.global_position = merged._merge_source_pos
+	card_a.rotation = merged._merge_source_rot
+	card_a.dropped_on.connect(_on_card_dropped_on)
+	card_a.unmerged.connect(_on_card_unmerged)
+	add_child(card_a)
+
+	var card_b: Card = CARD_SCENE.instantiate()
+	card_b.setup(merged._merge_target_data.value, merged._merge_target_data.display, merged._merge_target_data.suit)
+	card_b.global_position = merged._merge_target_pos
+	card_b.rotation = merged._merge_target_rot
+	card_b.dropped_on.connect(_on_card_dropped_on)
+	card_b.unmerged.connect(_on_card_unmerged)
+	add_child(card_b)
+
+	GameManager.on_unmerge(merged_idx, merged._merge_source_data, merged._merge_target_data)
+	_live_cards.remove_at(merged_idx)
+	_live_cards.push_back(card_a)
+	_live_cards.push_back(card_b)
+
+	merged.queue_free()
 	_set_cards_interactive(true)
 
 func _apply_op(a: float, b: float, op: String) -> Variant:

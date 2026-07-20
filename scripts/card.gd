@@ -2,6 +2,7 @@ class_name Card
 extends Node2D
 
 signal dropped_on(source: Card, target: Card)
+signal unmerged(card: Card)
 
 var value: float
 var display: String
@@ -15,6 +16,15 @@ var _original_rotation: float
 var _velocity: Vector2 = Vector2.ZERO
 var _prev_mouse_pos: Vector2 = Vector2.ZERO
 var _gliding: bool = false
+
+var is_merged: bool = false
+var _merge_op: String = ""
+var _merge_source_data: Dictionary = {}
+var _merge_target_data: Dictionary = {}
+var _merge_source_pos: Vector2 = Vector2.ZERO
+var _merge_target_pos: Vector2 = Vector2.ZERO
+var _merge_source_rot: float = 0.0
+var _merge_target_rot: float = 0.0
 
 const FRICTION := 0.88
 const BOUNCE := 0.25
@@ -47,11 +57,43 @@ func reveal_face() -> void:
 
 const _OP_SYMBOL := {"+": "+", "-": "−", "*": "×", "/": "÷"}
 
-func show_as_merged(op: String) -> void:
+func _make_merged_style() -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = Color(0.86, 0.86, 0.86, 1)
+	s.border_width_left = 2
+	s.border_width_top = 2
+	s.border_width_right = 2
+	s.border_width_bottom = 2
+	s.border_color = Color(0.45, 0.45, 0.45, 1)
+	s.corner_radius_top_left = 16
+	s.corner_radius_top_right = 16
+	s.corner_radius_bottom_left = 16
+	s.corner_radius_bottom_right = 16
+	return s
+
+func show_as_merged(op: String, src_data: Dictionary, src_pos: Vector2, src_rot: float, tgt_data: Dictionary, tgt_pos: Vector2, tgt_rot: float) -> void:
+	is_merged = true
+	_merge_op = op
+	_merge_source_data = src_data.duplicate()
+	_merge_target_data = tgt_data.duplicate()
+	_merge_source_pos = src_pos
+	_merge_source_rot = src_rot
+	_merge_target_pos = tgt_pos
+	_merge_target_rot = tgt_rot
+
+	$StackLayer1.add_theme_stylebox_override("panel", _make_style(_color_for_value(src_data.value)))
+	$StackLayer1/SL1Label.text = src_data.display
 	$StackLayer1.visible = true
+
+	$StackLayer0.add_theme_stylebox_override("panel", _make_style(_color_for_value(tgt_data.value)))
+	$StackLayer0/SL0Label.text = tgt_data.display
 	$StackLayer0.visible = true
-	$OperatorBadge/OperatorLabel.text = _OP_SYMBOL.get(op, op)
-	$OperatorBadge.visible = true
+
+	$Panel.add_theme_stylebox_override("panel", _make_merged_style())
+	$Panel/Label.add_theme_font_size_override("font_size", 48)
+	$Panel/Label.text = _OP_SYMBOL.get(op, op)
+	$Panel/ResultLabel.text = display
+	$Panel/ResultLabel.visible = true
 
 func _color_for_value(v: float) -> Color:
 	match int(v) if absf(v - roundf(v)) < 1e-9 else -1:
@@ -81,6 +123,10 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed and _is_mouse_over():
+				if is_merged:
+					input_enabled = false
+					emit_signal("unmerged", self)
+					return
 				_original_position = global_position
 				_original_rotation = rotation
 				_dragging = true

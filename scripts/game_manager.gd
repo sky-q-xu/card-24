@@ -50,6 +50,11 @@ func on_merge(idx_a: int, idx_b: int, result: float) -> void:
 			score -= 1
 			emit_signal("game_lost")
 
+func on_unmerge(merged_idx: int, data_a: Dictionary, data_b: Dictionary) -> void:
+	cards.remove_at(merged_idx)
+	cards.push_back(data_a)
+	cards.push_back(data_b)
+
 func _value_to_display(v: int) -> String:
 	match v:
 		1: return "A"
