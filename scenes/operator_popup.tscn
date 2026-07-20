@@ -1,54 +1,56 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://cdxcwa3ir30eu"]
 
-[ext_resource type="Script" path="res://scripts/operator_popup.gd" id="1"]
+[ext_resource type="Script" uid="uid://d3lpq6fi2rsn8" path="res://scripts/operator_popup.gd" id="1"]
 
-[node name="OperatorPopup" type="Control"]
-visible = false
+[node name="OperatorPopup" type="Control" unique_id=607278432]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=523091431]
+layout_mode = 0
 offset_right = 300.0
 offset_bottom = 150.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=2131806377]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="PanelContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1849042321]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "Choose operator"
 horizontal_alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=1253706432]
 layout_mode = 2
 
-[node name="ButtonPlus" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonPlus" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1606863676]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "+"
 
-[node name="ButtonMinus" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonMinus" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=905571588]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "−"
 
-[node name="ButtonMul" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonMul" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=610284918]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "×"
 
-[node name="ButtonDiv" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonDiv" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=932473733]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "÷"
 
-[node name="ButtonCancel" type="Button" parent="PanelContainer/VBoxContainer"]
+[node name="ButtonCancel" type="Button" parent="PanelContainer/VBoxContainer" unique_id=636340155]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "Cancel"
 
-[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonPlus" to="." method="_on_button_pressed" binds=["+"]]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonMinus" to="." method="_on_button_pressed" binds=["-"]]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonMul" to="." method="_on_button_pressed" binds=["*"]]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonDiv" to="." method="_on_button_pressed" binds=["/"]]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonPlus" to="." method="_on_button_pressed" binds= ["+"]]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonMinus" to="." method="_on_button_pressed" binds= ["-"]]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonMul" to="." method="_on_button_pressed" binds= ["*"]]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/ButtonDiv" to="." method="_on_button_pressed" binds= ["/"]]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/ButtonCancel" to="." method="_on_cancel_pressed"]

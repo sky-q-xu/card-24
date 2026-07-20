@@ -4,6 +4,10 @@ const CARD_SCENE = preload("res://scenes/card.tscn")
 
 @onready var operator_popup: OperatorPopup = $UILayer/OperatorPopup
 @onready var _card_slots: Node2D = $GameBoard/CardSlots
+@onready var _deck: Node2D = $GameBoard/Deck
+
+const DEAL_STAGGER := 0.12
+const DEAL_DURATION := 0.35
 
 var _live_cards: Array = []
 
@@ -21,10 +25,22 @@ func _on_round_started(card_data: Array) -> void:
 	for i in range(card_data.size()):
 		var c: Card = CARD_SCENE.instantiate()
 		c.setup(card_data[i].value, card_data[i].display, card_data[i].suit)
-		c.global_position = slots[i].global_position
+		c.global_position = _deck.global_position
+		c.scale = Vector2(0.6, 0.6)
+		c.input_enabled = false
 		c.dropped_on.connect(_on_card_dropped_on)
 		add_child(c)
 		_live_cards.append(c)
+		_animate_deal(c, slots[i].global_position, i)
+
+func _animate_deal(card: Card, target_position: Vector2, index: int) -> void:
+	var tween := create_tween()
+	tween.tween_interval(index * DEAL_STAGGER)
+	tween.tween_property(card, "global_position", target_position, DEAL_DURATION) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(card, "scale", Vector2.ONE, DEAL_DURATION) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_callback(func(): card.input_enabled = true)
 
 func _on_card_dropped_on(source: Card, target: Card) -> void:
 	_set_cards_interactive(false)

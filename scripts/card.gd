@@ -17,7 +17,9 @@ func setup(v: float, d: String, s: int) -> void:
 	display = d
 	suit = s
 	$Panel/Label.text = d
-	modulate = _color_for_value(v)
+	var style := StyleBoxFlat.new()
+	style.bg_color = _color_for_value(v)
+	$Panel.add_theme_stylebox_override("panel", style)
 
 func _color_for_value(v: float) -> Color:
 	match int(v) if absf(v - roundf(v)) < 1e-9 else -1:
