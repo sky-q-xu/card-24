@@ -109,11 +109,17 @@ func show_as_merged(op: String, src_data: Dictionary, src_pos: Vector2, src_rot:
 	$StackLayer1.offset_top    = -hh - STACK_OFFSET_Y
 	$StackLayer1.offset_right  =  hw - STACK_OFFSET_X
 	$StackLayer1.offset_bottom =  hh - STACK_OFFSET_Y
+	# Use the expression text if the constituent was itself a merged card,
+	# so the corner shows "4 + Q" instead of the raw value "16".
+	var src_corner: String = src_data.get("bar_text", src_data.display)
+	var tgt_corner: String = tgt_data.get("bar_text", tgt_data.display)
+	var src_font := 22 if src_corner.length() <= 2 else 14
+	var tgt_font := 22 if tgt_corner.length() <= 2 else 14
 	$StackLayer1.add_theme_stylebox_override("panel", _make_card_style(src_data.value))
-	$StackLayer1/TopLabel.text = src_data.display
-	$StackLayer1/TopLabel.add_theme_font_size_override("font_size", 22)
-	$StackLayer1/BottomLabel.text = src_data.display
-	$StackLayer1/BottomLabel.add_theme_font_size_override("font_size", 22)
+	$StackLayer1/TopLabel.text = src_corner
+	$StackLayer1/TopLabel.add_theme_font_size_override("font_size", src_font)
+	$StackLayer1/BottomLabel.text = src_corner
+	$StackLayer1/BottomLabel.add_theme_font_size_override("font_size", src_font)
 	$StackLayer1.visible = true
 
 	# Front card (StackLayer0 = target): centered at node origin so it peeks
@@ -123,10 +129,10 @@ func show_as_merged(op: String, src_data: Dictionary, src_pos: Vector2, src_rot:
 	$StackLayer0.offset_right  =  hw
 	$StackLayer0.offset_bottom =  hh
 	$StackLayer0.add_theme_stylebox_override("panel", _make_card_style(tgt_data.value))
-	$StackLayer0/TopLabel.text = tgt_data.display
-	$StackLayer0/TopLabel.add_theme_font_size_override("font_size", 22)
-	$StackLayer0/BottomLabel.text = tgt_data.display
-	$StackLayer0/BottomLabel.add_theme_font_size_override("font_size", 22)
+	$StackLayer0/TopLabel.text = tgt_corner
+	$StackLayer0/TopLabel.add_theme_font_size_override("font_size", tgt_font)
+	$StackLayer0/BottomLabel.text = tgt_corner
+	$StackLayer0/BottomLabel.add_theme_font_size_override("font_size", tgt_font)
 	$StackLayer0.visible = true
 
 	# Bar in front of both cards
@@ -135,11 +141,7 @@ func show_as_merged(op: String, src_data: Dictionary, src_pos: Vector2, src_rot:
 	$Panel.add_theme_stylebox_override("panel", _make_merged_style())
 	$Panel/TopLabel.visible = false
 	$Panel/BottomLabel.visible = false
-	# Use the constituent's bar expression if it was itself a merged card, so
-	# second-level merges read "4 + Q + 4" rather than "16 + 4".
-	var src_label: String = src_data.get("bar_text", src_data.display)
-	var tgt_label: String = tgt_data.get("bar_text", tgt_data.display)
-	_bar_text = src_label + " " + _OP_SYMBOL.get(op, op) + " " + tgt_label
+	_bar_text = src_corner + " " + _OP_SYMBOL.get(op, op) + " " + tgt_corner
 	$Panel/BarLabel.text = _bar_text
 	$Panel/BarLabel.visible = true
 
