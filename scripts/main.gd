@@ -112,9 +112,14 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 		_set_cards_interactive(true)
 		return
 
-	# Slide source onto target
+	# Slide source onto target — align centers so bar cards don't land offset
+	var slide_dest: Vector2
+	if source.is_merged:
+		slide_dest = target.get_center()
+	else:
+		slide_dest = target.get_center() - Vector2(Card.CARD_W * 0.5, Card.CARD_H * 0.5)
 	var slide := create_tween()
-	slide.tween_property(source, "global_position", target.global_position, 0.18) \
+	slide.tween_property(source, "global_position", slide_dest, 0.18) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	await slide.finished
 
@@ -123,8 +128,8 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 	var idx_b := _card_index(target)
 	var hi := maxi(idx_a, idx_b)
 	var lo := mini(idx_a, idx_b)
-	var src_data := {"value": source.value, "display": source.display, "suit": source.suit}
-	var tgt_data := {"value": target.value, "display": target.display, "suit": target.suit}
+	var src_data := _card_data(source)
+	var tgt_data := _card_data(target)
 	var src_orig_pos := source._original_position
 	var src_orig_rot := source._original_rotation
 	var tgt_pos := target.global_position
@@ -175,8 +180,8 @@ func _on_card_unmerged(merged: Card) -> void:
 	var merged_idx := _card_index(merged)
 
 	# Capture constituent data before animation
-	var src_data := merged._merge_source_data.duplicate()
-	var tgt_data := merged._merge_target_data.duplicate()
+	var src_data := merged._merge_source_data.duplicate(true)
+	var tgt_data := merged._merge_target_data.duplicate(true)
 	var src_pos := merged._merge_source_pos
 	var src_rot := merged._merge_source_rot
 	var tgt_pos := merged._merge_target_pos
@@ -194,7 +199,8 @@ func _on_card_unmerged(merged: Card) -> void:
 	_live_cards.remove_at(merged_idx)
 	merged.queue_free()
 
-	# Spawn constituent cards at original positions, collapsed and frozen
+	# Spawn constituent cards at original positions, collapsed and frozen.
+	# If a constituent was itself a merged bar card, reconstruct it as one.
 	var card_a: Card = CARD_SCENE.instantiate()
 	card_a.setup(src_data.value, src_data.display, src_data.suit)
 	card_a.global_position = src_pos
@@ -206,6 +212,16 @@ func _on_card_unmerged(merged: Card) -> void:
 	card_a.dropped_on.connect(_on_card_dropped_on)
 	card_a.unmerged.connect(_on_card_unmerged)
 	add_child(card_a)
+	if src_data.get("is_merged", false):
+		card_a.show_as_merged(
+			src_data.merge_op,
+			src_data.merge_src_data,
+			src_data.merge_src_pos,
+			src_data.merge_src_rot,
+			src_data.merge_tgt_data,
+			src_data.merge_tgt_pos,
+			src_data.merge_tgt_rot
+		)
 
 	var card_b: Card = CARD_SCENE.instantiate()
 	card_b.setup(tgt_data.value, tgt_data.display, tgt_data.suit)
@@ -218,6 +234,16 @@ func _on_card_unmerged(merged: Card) -> void:
 	card_b.dropped_on.connect(_on_card_dropped_on)
 	card_b.unmerged.connect(_on_card_unmerged)
 	add_child(card_b)
+	if tgt_data.get("is_merged", false):
+		card_b.show_as_merged(
+			tgt_data.merge_op,
+			tgt_data.merge_src_data,
+			tgt_data.merge_src_pos,
+			tgt_data.merge_src_rot,
+			tgt_data.merge_tgt_data,
+			tgt_data.merge_tgt_pos,
+			tgt_data.merge_tgt_rot
+		)
 
 	_live_cards.push_back(card_a)
 	_live_cards.push_back(card_b)
@@ -235,6 +261,19 @@ func _on_card_unmerged(merged: Card) -> void:
 	card_a.input_enabled = true
 	card_b.input_enabled = true
 	_set_cards_interactive(true)
+
+func _card_data(card: Card) -> Dictionary:
+	var data := {"value": card.value, "display": card.display, "suit": card.suit, "is_merged": card.is_merged}
+	if card.is_merged:
+		data["bar_text"] = card._bar_text
+		data["merge_op"] = card._merge_op
+		data["merge_src_data"] = card._merge_source_data.duplicate(true)
+		data["merge_src_pos"] = card._merge_source_pos
+		data["merge_src_rot"] = card._merge_source_rot
+		data["merge_tgt_data"] = card._merge_target_data.duplicate(true)
+		data["merge_tgt_pos"] = card._merge_target_pos
+		data["merge_tgt_rot"] = card._merge_target_rot
+	return data
 
 func _apply_op(a: float, b: float, op: String) -> Variant:
 	if op == "+":

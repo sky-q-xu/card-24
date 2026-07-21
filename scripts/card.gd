@@ -24,6 +24,7 @@ var _merge_source_pos: Vector2 = Vector2.ZERO
 var _merge_target_pos: Vector2 = Vector2.ZERO
 var _merge_source_rot: float = 0.0
 var _merge_target_rot: float = 0.0
+var _bar_text: String = ""
 
 const CARD_W := 120.0
 const CARD_H := 180.0
@@ -134,7 +135,12 @@ func show_as_merged(op: String, src_data: Dictionary, src_pos: Vector2, src_rot:
 	$Panel.add_theme_stylebox_override("panel", _make_merged_style())
 	$Panel/TopLabel.visible = false
 	$Panel/BottomLabel.visible = false
-	$Panel/BarLabel.text = src_data.display + " " + _OP_SYMBOL.get(op, op) + " " + tgt_data.display
+	# Use the constituent's bar expression if it was itself a merged card, so
+	# second-level merges read "4 + Q + 4" rather than "16 + 4".
+	var src_label := src_data.get("bar_text", src_data.display)
+	var tgt_label := tgt_data.get("bar_text", tgt_data.display)
+	_bar_text = src_label + " " + _OP_SYMBOL.get(op, op) + " " + tgt_label
+	$Panel/BarLabel.text = _bar_text
 	$Panel/BarLabel.visible = true
 
 	# Collision shapes cover only the bar (the interactive target)
@@ -146,7 +152,10 @@ func show_as_merged(op: String, src_data: Dictionary, src_pos: Vector2, src_rot:
 	$Area2D/CollisionShape2D.position = Vector2.ZERO
 
 func _color_for_value(v: float) -> Color:
-	match int(v) if absf(v - roundf(v)) < 1e-9 else -1:
+	if absf(v - roundf(v)) >= 1e-9:
+		var hue := fmod(absf(v) * 0.618033988749, 1.0)
+		return Color.from_hsv(hue, 0.55, 0.88)
+	match int(roundf(v)):
 		1:  return Color(1.0, 0.85, 0.3)
 		2:  return Color(0.5, 0.85, 0.5)
 		3:  return Color(1.0, 0.5,  0.4)
@@ -161,7 +170,9 @@ func _color_for_value(v: float) -> Color:
 		12: return Color(0.125, 0.55, 0.55)
 		13: return Color(0.9, 0.3,  0.3)
 		24: return Color(1.0, 0.9,  0.0)
-		_:  return Color(0.85, 0.85, 0.85)
+		_:
+			var hue := fmod(absf(roundf(v)) * 0.618033988749, 1.0)
+			return Color.from_hsv(hue, 0.55, 0.88)
 
 func _is_mouse_over() -> bool:
 	var local := to_local(get_viewport().get_mouse_position())
@@ -190,6 +201,7 @@ func _input(event: InputEvent) -> void:
 				freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
 				freeze = true
 				linear_velocity = Vector2.ZERO
+				$CollisionShape2D.disabled = true
 			else:
 				if _dragging:
 					_dragging = false
@@ -204,6 +216,7 @@ func _input(event: InputEvent) -> void:
 							emit_signal("unmerged", self)
 							return
 					freeze = false
+					$CollisionShape2D.disabled = false
 					linear_velocity = _tracked_velocity
 					_check_drop()
 
