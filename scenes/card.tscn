@@ -1,12 +1,23 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/card.gd" id="1"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(120, 180)
 
-[node name="Card" type="Node2D"]
+[sub_resource type="PhysicsMaterial" id="2"]
+bounce = 0.3
+friction = 0.0
+
+[node name="Card" type="RigidBody2D"]
 script = ExtResource("1")
+gravity_scale = 0.0
+linear_damp = 8.0
+physics_material_override = SubResource("2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(60, 90)
+shape = SubResource("1")
 
 [node name="StackLayer1" type="Panel" parent="."]
 visible = false
@@ -15,15 +26,28 @@ offset_top = -8.0
 offset_right = 112.0
 offset_bottom = 172.0
 
-[node name="SL1Label" type="Label" parent="StackLayer1"]
+[node name="TopLabel" type="Label" parent="StackLayer1"]
 layout_mode = 1
-anchors_preset = 15
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 72.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="BottomLabel" type="Label" parent="StackLayer1"]
+layout_mode = 1
+anchor_left = 1.0
 anchor_right = 1.0
+anchor_top = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 28
-horizontal_alignment = 1
+offset_left = -72.0
+offset_top = -50.0
+offset_right = -8.0
+offset_bottom = -8.0
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="StackLayer0" type="Panel" parent="."]
@@ -33,41 +57,67 @@ offset_top = -4.0
 offset_right = 116.0
 offset_bottom = 176.0
 
-[node name="SL0Label" type="Label" parent="StackLayer0"]
+[node name="TopLabel" type="Label" parent="StackLayer0"]
 layout_mode = 1
-anchors_preset = 15
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 72.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="BottomLabel" type="Label" parent="StackLayer0"]
+layout_mode = 1
+anchor_left = 1.0
 anchor_right = 1.0
+anchor_top = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 28
-horizontal_alignment = 1
+offset_left = -72.0
+offset_top = -50.0
+offset_right = -8.0
+offset_bottom = -8.0
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="Panel" type="Panel" parent="."]
 offset_right = 120.0
 offset_bottom = 180.0
 
-[node name="Label" type="Label" parent="Panel"]
+[node name="TopLabel" type="Label" parent="Panel"]
+layout_mode = 1
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 72.0
+offset_bottom = 52.0
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 0
+vertical_alignment = 1
+
+[node name="BottomLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -72.0
+offset_top = -52.0
+offset_right = -8.0
+offset_bottom = -8.0
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="BarLabel" type="Label" parent="Panel"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 32
-text = "?"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ResultLabel" type="Label" parent="Panel"]
-visible = false
-layout_mode = 3
-offset_left = 0.0
-offset_top = 142.0
-offset_right = 120.0
-offset_bottom = 178.0
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 vertical_alignment = 1
 
