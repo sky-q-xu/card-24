@@ -137,8 +137,8 @@ func show_as_merged(op: String, src_data: Dictionary, src_pos: Vector2, src_rot:
 	$Panel/BottomLabel.visible = false
 	# Use the constituent's bar expression if it was itself a merged card, so
 	# second-level merges read "4 + Q + 4" rather than "16 + 4".
-	var src_label := src_data.get("bar_text", src_data.display)
-	var tgt_label := tgt_data.get("bar_text", tgt_data.display)
+	var src_label: String = src_data.get("bar_text", src_data.display)
+	var tgt_label: String = tgt_data.get("bar_text", tgt_data.display)
 	_bar_text = src_label + " " + _OP_SYMBOL.get(op, op) + " " + tgt_label
 	$Panel/BarLabel.text = _bar_text
 	$Panel/BarLabel.visible = true
