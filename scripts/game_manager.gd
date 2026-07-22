@@ -17,6 +17,13 @@ func deal_new_round(increment_round: bool = true) -> void:
 		while not Solver.can_reach_24(vals) and tries < 100:
 			vals = _pick_four()
 			tries += 1
+	else:
+		# 2:3 solvable:unsolvable ratio (40% solvable, 60% unsolvable)
+		var want_solvable := randf() < 0.4
+		var tries := 0
+		while Solver.can_reach_24(vals) != want_solvable and tries < 200:
+			vals = _pick_four()
+			tries += 1
 	cards = []
 	for v in vals:
 		cards.append({
