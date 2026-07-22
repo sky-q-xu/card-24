@@ -37,7 +37,7 @@ static func _try_all_parens_expr(v: Array, ops: Array) -> String:
 	var b := {"v": float(v[1]), "s": _fmt(v[1])}
 	var c := {"v": float(v[2]), "s": _fmt(v[2])}
 	var d := {"v": float(v[3]), "s": _fmt(v[3])}
-	var o1 := ops[0]; var o2 := ops[1]; var o3 := ops[2]
+	var o1: String = ops[0]; var o2: String = ops[1]; var o3: String = ops[2]
 	var patterns: Array = [
 		_ce(_ce(_ce(a, o1, b), o2, c), o3, d),
 		_ce(_ce(a, o1, _ce(b, o2, c)), o3, d),
