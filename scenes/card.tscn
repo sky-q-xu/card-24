@@ -6,13 +6,13 @@
 size = Vector2(120, 180)
 
 [sub_resource type="PhysicsMaterial" id="2"]
-bounce = 0.3
+bounce = 0.55
 friction = 0.0
 
 [node name="Card" type="RigidBody2D"]
 script = ExtResource("1")
 gravity_scale = 0.0
-linear_damp = 8.0
+linear_damp = 1.5
 physics_material_override = SubResource("2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
