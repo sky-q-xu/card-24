@@ -44,7 +44,16 @@ size_flags_vertical = 3
 theme_override_font_sizes/font_size = 48
 text = "÷"
 
+[node name="ButtonCancel" type="Button" parent="Bar"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(0.75, 0.1, 0.1, 1)
+text = "✕"
+
 [connection signal="pressed" from="Bar/ButtonPlus" to="." method="_on_button_pressed" binds= ["+"]]
 [connection signal="pressed" from="Bar/ButtonMinus" to="." method="_on_button_pressed" binds= ["-"]]
 [connection signal="pressed" from="Bar/ButtonMul" to="." method="_on_button_pressed" binds= ["*"]]
 [connection signal="pressed" from="Bar/ButtonDiv" to="." method="_on_button_pressed" binds= ["/"]]
+[connection signal="pressed" from="Bar/ButtonCancel" to="." method="_on_cancel_pressed"]
