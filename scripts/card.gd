@@ -28,8 +28,7 @@ var _bar_text: String = ""
 
 const CARD_W := 120.0
 const CARD_H := 180.0
-const BAR_HW := 120.0
-const BAR_HH := 40.0
+const BADGE_HALF := 28.0
 # Offset applied to back card so its top-left corner peeks above/left of the front card
 const STACK_OFFSET_X := 16.0
 const STACK_OFFSET_Y := 30.0
@@ -52,16 +51,16 @@ func _make_card_style(v: float) -> StyleBoxFlat:
 
 func _make_merged_style() -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
-	s.bg_color = Color(0.86, 0.86, 0.86, 1)
+	s.bg_color = Color(0.97, 0.97, 0.97, 1.0)
 	s.border_width_left = 2
 	s.border_width_top = 2
 	s.border_width_right = 2
 	s.border_width_bottom = 2
-	s.border_color = Color(0.45, 0.45, 0.45, 1)
-	s.corner_radius_top_left = 16
-	s.corner_radius_top_right = 16
-	s.corner_radius_bottom_left = 16
-	s.corner_radius_bottom_right = 16
+	s.border_color = Color(0.3, 0.3, 0.3, 0.85)
+	s.corner_radius_top_left = int(BADGE_HALF)
+	s.corner_radius_top_right = int(BADGE_HALF)
+	s.corner_radius_bottom_left = int(BADGE_HALF)
+	s.corner_radius_bottom_right = int(BADGE_HALF)
 	return s
 
 func setup(v: float, d: String, s: int) -> void:
@@ -135,22 +134,22 @@ func show_as_merged(op: String, src_data: Dictionary, src_pos: Vector2, src_rot:
 	$StackLayer0/BottomLabel.add_theme_font_size_override("font_size", tgt_font)
 	$StackLayer0.visible = true
 
-	# Bar in front of both cards
-	$Panel.offset_left  = -BAR_HW; $Panel.offset_top    = -BAR_HH
-	$Panel.offset_right =  BAR_HW; $Panel.offset_bottom =  BAR_HH
+	# Small circular badge centered on the stack showing just the operator symbol
+	$Panel.offset_left  = -BADGE_HALF; $Panel.offset_top    = -BADGE_HALF
+	$Panel.offset_right =  BADGE_HALF; $Panel.offset_bottom =  BADGE_HALF
 	$Panel.add_theme_stylebox_override("panel", _make_merged_style())
 	$Panel/TopLabel.visible = false
 	$Panel/BottomLabel.visible = false
 	_bar_text = src_corner + " " + _OP_SYMBOL.get(op, op) + " " + tgt_corner
-	$Panel/BarLabel.text = _bar_text
+	$Panel/BarLabel.text = _OP_SYMBOL.get(op, op)
 	$Panel/BarLabel.visible = true
 
-	# Collision shapes cover only the bar (the interactive target)
-	var bar_shape := RectangleShape2D.new()
-	bar_shape.size = Vector2(BAR_HW * 2.0, BAR_HH * 2.0)
-	$CollisionShape2D.shape = bar_shape
+	# Collision shape covers the front card body
+	var card_shape := RectangleShape2D.new()
+	card_shape.size = Vector2(CARD_W, CARD_H)
+	$CollisionShape2D.shape = card_shape
 	$CollisionShape2D.position = Vector2.ZERO
-	$Area2D/CollisionShape2D.shape = bar_shape
+	$Area2D/CollisionShape2D.shape = card_shape
 	$Area2D/CollisionShape2D.position = Vector2.ZERO
 
 func _color_for_value(v: float) -> Color:
@@ -179,12 +178,11 @@ func _color_for_value(v: float) -> Color:
 func _is_mouse_over() -> bool:
 	var local := to_local(get_viewport().get_mouse_position())
 	if is_merged:
-		# Union of bar + front card + back card (shifted up-left)
-		var bar   := Rect2(-BAR_HW, -BAR_HH, BAR_HW * 2.0, BAR_HH * 2.0)
+		# Union of front card + back card (shifted up-left)
 		var front := Rect2(-CARD_W * 0.5, -CARD_H * 0.5, CARD_W, CARD_H)
 		var back  := Rect2(-CARD_W * 0.5 - STACK_OFFSET_X, -CARD_H * 0.5 - STACK_OFFSET_Y,
 				CARD_W, CARD_H)
-		return bar.has_point(local) or front.has_point(local) or back.has_point(local)
+		return front.has_point(local) or back.has_point(local)
 	return Rect2(0.0, 0.0, CARD_W, CARD_H).has_point(local)
 
 func _input(event: InputEvent) -> void:
@@ -208,15 +206,13 @@ func _input(event: InputEvent) -> void:
 				if _dragging:
 					_dragging = false
 					z_index = 0
-					# Short tap on the bar specifically = unmerge
+					# Short tap anywhere on the merged stack = unmerge
 					if is_merged and (event.global_position - _press_position).length() < 8.0:
-						var local := to_local(event.global_position)
-						if Rect2(-BAR_HW, -BAR_HH, BAR_HW * 2.0, BAR_HH * 2.0).has_point(local):
-							global_position = _original_position
-							rotation = _original_rotation
-							input_enabled = false
-							emit_signal("unmerged", self)
-							return
+						global_position = _original_position
+						rotation = _original_rotation
+						input_enabled = false
+						emit_signal("unmerged", self)
+						return
 					freeze = false
 					$CollisionShape2D.disabled = false
 					linear_velocity = _tracked_velocity
@@ -231,8 +227,8 @@ func _clamp_drag_to_walls() -> void:
 	var vp := get_viewport_rect().size
 	var pos := global_position
 	if is_merged:
-		pos.x = clampf(pos.x, BAR_HW, vp.x - BAR_HW)
-		pos.y = clampf(pos.y, BAR_HH + STACK_OFFSET_Y, vp.y - BAR_HH)
+		pos.x = clampf(pos.x, CARD_W * 0.5 + STACK_OFFSET_X, vp.x - CARD_W * 0.5)
+		pos.y = clampf(pos.y, CARD_H * 0.5 + STACK_OFFSET_Y, vp.y - CARD_H * 0.5)
 	else:
 		pos.x = clampf(pos.x, 0.0, vp.x - CARD_W)
 		pos.y = clampf(pos.y, 0.0, vp.y - CARD_H)
