@@ -40,5 +40,18 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 36
 text = "Solvable: OFF"
 
+[node name="GiveUpButton" type="Button" parent="."]
+layout_mode = 1
+anchor_left = 0.83
+anchor_right = 0.99
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -90.0
+offset_bottom = -15.0
+theme_override_font_sizes/font_size = 28
+theme_override_colors/font_color = Color(0.6, 0.1, 0.1, 1)
+text = "Give Up"
+
 [connection signal="pressed" from="GridContainer/NewDeal" to="." method="_on_new_deal_pressed"]
 [connection signal="pressed" from="GridContainer/SolvableToggle" to="." method="_on_solvable_toggled"]
+[connection signal="pressed" from="GiveUpButton" to="." method="_on_give_up_pressed"]

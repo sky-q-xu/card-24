@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/operator_bar.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/screens/win_screen.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/screens/lose_screen.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/screens/give_up_screen.tscn" id="6"]
 
 [sub_resource type="StyleBoxFlat" id="6"]
 bg_color = Color(1, 1, 1, 1)
@@ -95,3 +96,5 @@ transform = Transform2D(1, 0, 0, 1, -550, -200)
 [node name="LoseScreen" parent="." instance=ExtResource("5")]
 offset = Vector2(-550, -200)
 transform = Transform2D(1, 0, 0, 1, -550, -200)
+
+[node name="GiveUpScreen" parent="." instance=ExtResource("6")]

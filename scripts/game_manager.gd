@@ -5,10 +5,12 @@ var ensure_solvable: bool = false
 signal round_started(card_data: Array)
 signal game_won
 signal game_lost
+signal game_given_up(solvable: bool, solution: String)
 
 var cards: Array = []
 var round: int = 1
 var score: int = 0
+var _round_values: Array = []
 
 func deal_new_round(increment_round: bool = true) -> void:
 	var vals := _pick_four()
@@ -24,6 +26,7 @@ func deal_new_round(increment_round: bool = true) -> void:
 		while Solver.can_reach_24(vals) != want_solvable and tries < 200:
 			vals = _pick_four()
 			tries += 1
+	_round_values = vals.duplicate()
 	cards = []
 	for v in vals:
 		cards.append({
@@ -34,6 +37,14 @@ func deal_new_round(increment_round: bool = true) -> void:
 	if increment_round:
 		round += 1
 	emit_signal("round_started", cards.duplicate())
+
+func give_up() -> void:
+	var solvable := Solver.can_reach_24(_round_values)
+	var solution := ""
+	if solvable:
+		score -= 2
+		solution = Solver.find_solution(_round_values)
+	emit_signal("game_given_up", solvable, solution)
 
 func _pick_four() -> Array:
 	var vals := []
