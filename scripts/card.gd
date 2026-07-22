@@ -25,13 +25,19 @@ var _merge_target_pos: Vector2 = Vector2.ZERO
 var _merge_source_rot: float = 0.0
 var _merge_target_rot: float = 0.0
 var _bar_text: String = ""
+var _leaf_count: int = 0
+var _badge_w: float = 0.0
 
 const CARD_W := 120.0
 const CARD_H := 180.0
-const BADGE_HALF := 28.0
-# Offset applied to back card so its top-left corner peeks above/left of the front card
 const STACK_OFFSET_X := 16.0
 const STACK_OFFSET_Y := 30.0
+const BADGE_H := 48.0
+const BADGE_GAP := 2.0
+const BADGE_FONT_SIZE := 14
+const BADGE_CHAR_W := 10.0   # estimated px per character at BADGE_FONT_SIZE
+const BADGE_PAD_X := 16.0    # total horizontal padding inside badge
+const BADGE_MIN_W := 52.0
 
 func _make_style(color: Color) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
@@ -51,16 +57,16 @@ func _make_card_style(v: float) -> StyleBoxFlat:
 
 func _make_merged_style() -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
-	s.bg_color = Color(0.97, 0.97, 0.97, 1.0)
+	s.bg_color = Color(0.95, 0.93, 0.88, 1.0)
 	s.border_width_left = 2
 	s.border_width_top = 2
 	s.border_width_right = 2
 	s.border_width_bottom = 2
-	s.border_color = Color(0.3, 0.3, 0.3, 0.85)
-	s.corner_radius_top_left = int(BADGE_HALF)
-	s.corner_radius_top_right = int(BADGE_HALF)
-	s.corner_radius_bottom_left = int(BADGE_HALF)
-	s.corner_radius_bottom_right = int(BADGE_HALF)
+	s.border_color = Color(0.3, 0.24, 0.18, 1.0)
+	s.corner_radius_top_left = 8
+	s.corner_radius_top_right = 8
+	s.corner_radius_bottom_left = 8
+	s.corner_radius_bottom_right = 8
 	return s
 
 func setup(v: float, d: String, s: int) -> void:
@@ -88,6 +94,16 @@ func get_center() -> Vector2:
 
 const _OP_SYMBOL := {"+": "+", "-": "−", "*": "×", "/": "÷"}
 
+# Returns a flat list of all individual (leaf) card data dicts, front first.
+func _flatten_to_leaves(data: Dictionary) -> Array:
+	if not data.get("is_merged", false):
+		return [data]
+	var leaves := []
+	# tgt = front constituent, src = back constituent
+	leaves.append_array(_flatten_to_leaves(data.get("merge_tgt_data", {})))
+	leaves.append_array(_flatten_to_leaves(data.get("merge_src_data", {})))
+	return leaves
+
 func show_as_merged(op: String, src_data: Dictionary, src_pos: Vector2, src_rot: float,
 		tgt_data: Dictionary, tgt_pos: Vector2, tgt_rot: float) -> void:
 	is_merged = true
@@ -99,49 +115,60 @@ func show_as_merged(op: String, src_data: Dictionary, src_pos: Vector2, src_rot:
 	_merge_target_pos = tgt_pos
 	_merge_target_rot = tgt_rot
 
-	# Back card (StackLayer1 = source): shifted up-left so its top-left corner
-	# peeks above and to the left of the front card. Both TopLabel and BottomLabel
-	# are set but BottomLabel ends up hidden behind StackLayer0.
-	var hw := CARD_W * 0.5  # 60
-	var hh := CARD_H * 0.5  # 90
-	$StackLayer1.offset_left   = -hw - STACK_OFFSET_X
-	$StackLayer1.offset_top    = -hh - STACK_OFFSET_Y
-	$StackLayer1.offset_right  =  hw - STACK_OFFSET_X
-	$StackLayer1.offset_bottom =  hh - STACK_OFFSET_Y
-	# Use the expression text if the constituent was itself a merged card,
-	# so the corner shows "4 + Q" instead of the raw value "16".
-	var src_corner: String = src_data.get("bar_text", src_data.display)
-	var tgt_corner: String = tgt_data.get("bar_text", tgt_data.display)
-	var src_font := 22 if src_corner.length() <= 2 else 14
-	var tgt_font := 22 if tgt_corner.length() <= 2 else 14
-	$StackLayer1.add_theme_stylebox_override("panel", _make_card_style(src_data.value))
-	$StackLayer1/TopLabel.text = src_corner
-	$StackLayer1/TopLabel.add_theme_font_size_override("font_size", src_font)
-	$StackLayer1/BottomLabel.text = src_corner
-	$StackLayer1/BottomLabel.add_theme_font_size_override("font_size", src_font)
-	$StackLayer1.visible = true
+	# Flatten to individual leaf cards: target = front, source = behind
+	var leaves := []
+	leaves.append_array(_flatten_to_leaves(tgt_data))
+	leaves.append_array(_flatten_to_leaves(src_data))
+	_leaf_count = mini(leaves.size(), 4)
 
-	# Front card (StackLayer0 = target): centered at node origin so it peeks
-	# 50 px above the bar top and 50 px below the bar bottom.
-	$StackLayer0.offset_left   = -hw
-	$StackLayer0.offset_top    = -hh
-	$StackLayer0.offset_right  =  hw
-	$StackLayer0.offset_bottom =  hh
-	$StackLayer0.add_theme_stylebox_override("panel", _make_card_style(tgt_data.value))
-	$StackLayer0/TopLabel.text = tgt_corner
-	$StackLayer0/TopLabel.add_theme_font_size_override("font_size", tgt_font)
-	$StackLayer0/BottomLabel.text = tgt_corner
-	$StackLayer0/BottomLabel.add_theme_font_size_override("font_size", tgt_font)
-	$StackLayer0.visible = true
+	var hw := CARD_W * 0.5
+	var hh := CARD_H * 0.5
+	var layer_nodes := [$StackLayer0, $StackLayer1, $StackLayer2, $StackLayer3]
 
-	# Small circular badge centered on the stack showing just the operator symbol
-	$Panel.offset_left  = -BADGE_HALF; $Panel.offset_top    = -BADGE_HALF
-	$Panel.offset_right =  BADGE_HALF; $Panel.offset_bottom =  BADGE_HALF
-	$Panel.add_theme_stylebox_override("panel", _make_merged_style())
+	# Show one StackLayer per leaf, each shifted diagonally back
+	for i in range(4):
+		var layer: Control = layer_nodes[i]
+		if i >= _leaf_count:
+			layer.visible = false
+			continue
+		var leaf: Dictionary = leaves[i]
+		var ox := -float(i) * STACK_OFFSET_X
+		var oy := -float(i) * STACK_OFFSET_Y
+		layer.offset_left   = -hw + ox
+		layer.offset_top    = -hh + oy
+		layer.offset_right  =  hw + ox
+		layer.offset_bottom =  hh + oy
+		var corner_text: String = leaf.get("display", "?")
+		layer.add_theme_stylebox_override("panel", _make_card_style(leaf.value))
+		layer.get_node("TopLabel").text = corner_text
+		layer.get_node("BottomLabel").text = corner_text
+		layer.visible = true
+
+	# Hide the main card face (Panel body) — it becomes the side badge
 	$Panel/TopLabel.visible = false
 	$Panel/BottomLabel.visible = false
-	_bar_text = src_corner + " " + _OP_SYMBOL.get(op, op) + " " + tgt_corner
-	$Panel/BarLabel.text = _OP_SYMBOL.get(op, op)
+
+	# Build expression string for badge, wrapping merged constituents in parens
+	var src_expr: String = src_data.get("bar_text", src_data.display)
+	var tgt_expr: String = tgt_data.get("bar_text", tgt_data.display)
+	if src_data.get("is_merged", false):
+		src_expr = "(" + src_expr + ")"
+	if tgt_data.get("is_merged", false):
+		tgt_expr = "(" + tgt_expr + ")"
+	_bar_text = src_expr + " " + _OP_SYMBOL.get(op, op) + " " + tgt_expr
+
+	# Square badge to the LEFT of the stack — expands to fit the expression
+	_badge_w = maxf(BADGE_MIN_W, float(_bar_text.length()) * BADGE_CHAR_W + BADGE_PAD_X)
+	var stack_left := -hw - (_leaf_count - 1) * STACK_OFFSET_X
+	var badge_right := stack_left - BADGE_GAP
+	$Panel.offset_left   = badge_right - _badge_w
+	$Panel.offset_top    = -BADGE_H * 0.5
+	$Panel.offset_right  = badge_right
+	$Panel.offset_bottom =  BADGE_H * 0.5
+	$Panel.add_theme_stylebox_override("panel", _make_merged_style())
+	$Panel/BarLabel.add_theme_font_size_override("font_size", BADGE_FONT_SIZE)
+	$Panel/BarLabel.add_theme_color_override("font_color", Color.BLACK)
+	$Panel/BarLabel.text = _bar_text
 	$Panel/BarLabel.visible = true
 
 	# Collision shape covers the front card body
@@ -178,11 +205,20 @@ func _color_for_value(v: float) -> Color:
 func _is_mouse_over() -> bool:
 	var local := to_local(get_viewport().get_mouse_position())
 	if is_merged:
-		# Union of front card + back card (shifted up-left)
-		var front := Rect2(-CARD_W * 0.5, -CARD_H * 0.5, CARD_W, CARD_H)
-		var back  := Rect2(-CARD_W * 0.5 - STACK_OFFSET_X, -CARD_H * 0.5 - STACK_OFFSET_Y,
-				CARD_W, CARD_H)
-		return front.has_point(local) or back.has_point(local)
+		var hw := CARD_W * 0.5
+		var hh := CARD_H * 0.5
+		# Check each visible stack layer
+		for i in range(_leaf_count):
+			var ox := -float(i) * STACK_OFFSET_X
+			var oy := -float(i) * STACK_OFFSET_Y
+			if Rect2(-hw + ox, -hh + oy, CARD_W, CARD_H).has_point(local):
+				return true
+		# Check badge rect
+		var stack_left := -hw - (_leaf_count - 1) * STACK_OFFSET_X
+		var badge_right := stack_left - BADGE_GAP
+		if Rect2(badge_right - _badge_w, -BADGE_H * 0.5, _badge_w, BADGE_H).has_point(local):
+			return true
+		return false
 	return Rect2(0.0, 0.0, CARD_W, CARD_H).has_point(local)
 
 func _input(event: InputEvent) -> void:
@@ -227,8 +263,13 @@ func _clamp_drag_to_walls() -> void:
 	var vp := get_viewport_rect().size
 	var pos := global_position
 	if is_merged:
-		pos.x = clampf(pos.x, CARD_W * 0.5 + STACK_OFFSET_X, vp.x - CARD_W * 0.5)
-		pos.y = clampf(pos.y, CARD_H * 0.5 + STACK_OFFSET_Y, vp.y - CARD_H * 0.5)
+		var hw := CARD_W * 0.5
+		var hh := CARD_H * 0.5
+		var n := _leaf_count
+		# Left edge is the badge; right/bottom edge is the front card
+		var left_margin := hw + (n - 1) * STACK_OFFSET_X + BADGE_GAP + _badge_w
+		pos.x = clampf(pos.x, left_margin, vp.x - hw)
+		pos.y = clampf(pos.y, hh + (n - 1) * STACK_OFFSET_Y, vp.y - hh)
 	else:
 		pos.x = clampf(pos.x, 0.0, vp.x - CARD_W)
 		pos.y = clampf(pos.y, 0.0, vp.y - CARD_H)
