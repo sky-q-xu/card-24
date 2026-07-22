@@ -1,8 +1,8 @@
 extends CanvasLayer
 
-@onready var title_label: Label = $Background/CenterContainer/VBoxContainer/TitleLabel
-@onready var solution_label: Label = $Background/CenterContainer/VBoxContainer/SolutionLabel
-@onready var score_label: Label = $Background/CenterContainer/VBoxContainer/ScoreLabel
+@onready var title_label: Label = $Background/CenterContainer/VBoxContainer/Card/VBoxInner/TitleLabel
+@onready var solution_label: Label = $Background/CenterContainer/VBoxContainer/Card/VBoxInner/SolutionLabel
+@onready var score_label: Label = $Background/CenterContainer/VBoxContainer/Card/VBoxInner/ScoreLabel
 
 func _ready() -> void:
 	hide()
