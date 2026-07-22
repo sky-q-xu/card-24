@@ -17,10 +17,10 @@ func _on_game_given_up(solvable: bool, solution: String) -> void:
 		title_label.text = "No solution exists for this hand!"
 		solution_label.visible = false
 	score_label.text = "Score: %d" % GameManager.score
-	modulate.a = 0.0
+	$Background.modulate.a = 0.0
 	show()
 	var tween := create_tween()
-	tween.tween_property(self, "modulate:a", 1.0, 0.35).set_ease(Tween.EASE_OUT)
+	tween.tween_property($Background, "modulate:a", 1.0, 0.35).set_ease(Tween.EASE_OUT)
 
 func _on_next_round_pressed() -> void:
 	hide()
