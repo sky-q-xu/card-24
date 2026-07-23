@@ -15,6 +15,7 @@ var _live_cards: Array = []
 var _auto_solving: bool = false
 var _discard_count: int = 0
 var _discard_pile_cards: Array = []  # card nodes kept alive in the pile display
+var _active_deal_tweens: Array = []   # tweens created by _animate_deal
 
 const DISCARD_MAX_VISIBLE := 3
 const DISCARD_STACK_OFFSET := Vector2(5.0, 5.0)
@@ -183,6 +184,9 @@ func _animate_to_discard(card: Card, delay: float) -> void:
 	card.freeze = true
 	card.linear_velocity = Vector2.ZERO
 	card.angular_velocity = 0.0
+	# Prevent discarded cards from triggering drop events or physics collisions
+	card.get_node("CollisionShape2D").disabled = true
+	card.get_node("Area2D").monitoring = false
 	var dest: Vector2 = $GameBoard/DiscardPile.global_position
 	var tween := create_tween()
 	if delay > 0.0:
@@ -220,6 +224,11 @@ func _update_discard_pile() -> void:
 
 func _on_round_started(card_data: Array) -> void:
 	_auto_solving = false
+	# Kill any deal animations still running so their callbacks can't fire on freed cards
+	for t in _active_deal_tweens:
+		if t:
+			t.kill()
+	_active_deal_tweens.clear()
 	_discard_count += _live_cards.size()
 	for i in _live_cards.size():
 		_animate_to_discard(_live_cards[i], i * 0.06)
@@ -249,6 +258,7 @@ func _animate_deal(card: Card, target_position: Vector2, index: int) -> void:
 	)
 	var final_rot := randf_range(-JITTER_ROT, JITTER_ROT)
 	var tween := create_tween()
+	_active_deal_tweens.append(tween)
 	tween.tween_interval(index * DEAL_STAGGER)
 	tween.tween_property(card, "global_position", final_pos, DEAL_DURATION) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
@@ -258,10 +268,16 @@ func _animate_deal(card: Card, target_position: Vector2, index: int) -> void:
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.tween_property(card, "scale:x", 0.0, FLIP_DURATION) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-	tween.tween_callback(func(): card.reveal_face())
+	tween.tween_callback(func():
+		if is_instance_valid(card): card.reveal_face()
+	)
 	tween.tween_property(card, "scale:x", 1.0, FLIP_DURATION) \
 		.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_callback(func(): card.input_enabled = true; card.freeze = false)
+	tween.tween_callback(func():
+		if is_instance_valid(card):
+			card.input_enabled = true
+			card.freeze = false
+	)
 
 func _on_card_dropped_on(source: Card, target: Card) -> void:
 	_set_cards_interactive(false)
