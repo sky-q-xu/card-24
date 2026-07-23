@@ -12,11 +12,13 @@ const JITTER_POS := 10.0
 const JITTER_ROT := 0.12
 
 var _live_cards: Array = []
+var _auto_solving: bool = false
 
 signal _merge_resolved(op: String)
 
 func _ready() -> void:
 	GameManager.round_started.connect(_on_round_started)
+	GameManager.game_given_up.connect(_on_game_given_up)
 	GameManager.deal_new_round(false)
 	_create_walls()
 
@@ -38,7 +40,108 @@ func _create_walls() -> void:
 		sb.add_child(cs)
 		add_child(sb)
 
+func _on_game_given_up(solvable: bool, steps: Array) -> void:
+	if solvable:
+		_auto_solve_animation(steps)  # fire-and-forget coroutine
+
+func _find_card_with_value(val: float, exclude: Card = null) -> Card:
+	for card in _live_cards:
+		if card != exclude and abs(card.value - val) < 1e-9:
+			return card
+	return null
+
+func _auto_solve_animation(steps: Array) -> void:
+	_auto_solving = true
+	_set_cards_interactive(false)
+	# Cancel any in-progress operator selection
+	_merge_resolved.emit("")
+	operator_bar.deactivate()
+
+	for step in steps:
+		if not _auto_solving:
+			return
+		var a_val: float = step["a_val"]
+		var b_val: float = step["b_val"]
+		var op: String = step["op"]
+		var result_val: float = step["result_val"]
+
+		var source := _find_card_with_value(a_val)
+		var target := _find_card_with_value(b_val, source)
+		if source == null or target == null:
+			break
+
+		source.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+		source.freeze = true
+		source.linear_velocity = Vector2.ZERO
+		target.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+		target.freeze = true
+		target.linear_velocity = Vector2.ZERO
+
+		var slide_dest: Vector2
+		if source.is_merged:
+			slide_dest = target.get_center()
+		else:
+			slide_dest = target.get_center() - Vector2(Card.CARD_W * 0.5, Card.CARD_H * 0.5)
+		var slide := create_tween()
+		slide.tween_property(source, "global_position", slide_dest, 0.30) \
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		await slide.finished
+		if not _auto_solving or not is_instance_valid(source) or not is_instance_valid(target):
+			return
+
+		var idx_a := _card_index(source)
+		var idx_b := _card_index(target)
+		var hi := maxi(idx_a, idx_b)
+		var lo := mini(idx_a, idx_b)
+		var src_data := _card_data(source)
+		var tgt_data := _card_data(target)
+		var src_pos := source.global_position
+		var src_rot := source.rotation
+		var tgt_pos := target.global_position
+		var tgt_rot := target.rotation
+		var tgt_center := target.get_center()
+
+		var shrink := create_tween()
+		shrink.tween_property(source, "scale", Vector2.ZERO, 0.12) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		shrink.parallel().tween_property(target, "scale", Vector2.ZERO, 0.12) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		await shrink.finished
+		if not _auto_solving:
+			return
+
+		source.queue_free()
+		target.queue_free()
+		_live_cards.remove_at(hi)
+		_live_cards.remove_at(lo)
+
+		var merged: Card = CARD_SCENE.instantiate()
+		merged.setup(result_val, GameManager.format_value(result_val), 0)
+		merged.global_position = tgt_center
+		merged.rotation = 0.0
+		merged.scale = Vector2(0.0, 1.0)
+		merged.input_enabled = false
+		merged.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+		merged.freeze = true
+		add_child(merged)
+		merged.show_as_merged(op, src_data, src_pos, src_rot, tgt_data, tgt_pos, tgt_rot)
+		_live_cards.append(merged)
+
+		var unfold := create_tween()
+		unfold.tween_property(merged, "scale:x", 1.0, 0.28) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		await unfold.finished
+		if not _auto_solving:
+			return
+
+	# Pause so the player can see the final result, then start next round
+	await get_tree().create_timer(2.0).timeout
+	if _auto_solving:
+		_auto_solving = false
+		GameManager.deal_new_round()
+
 func _on_round_started(card_data: Array) -> void:
+	_auto_solving = false
 	for card in _live_cards:
 		card.queue_free()
 	_live_cards.clear()

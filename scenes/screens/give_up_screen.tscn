@@ -3,83 +3,59 @@
 [ext_resource type="Script" path="res://scripts/give_up_screen.gd" id="1"]
 
 [sub_resource type="StyleBoxFlat" id="1"]
-bg_color = Color(0.08, 0.08, 0.08, 0.78)
+bg_color = Color(0.18, 0.08, 0.08, 0.95)
+border_width_top = 2
+border_color = Color(0.6, 0.2, 0.2, 1)
 corner_radius_top_left = 0
 corner_radius_top_right = 0
 corner_radius_bottom_left = 0
 corner_radius_bottom_right = 0
 
 [sub_resource type="StyleBoxFlat" id="2"]
-bg_color = Color(0.96, 0.94, 0.90, 1.0)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.30, 0.24, 0.18, 1)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_left = 20
-corner_radius_bottom_right = 20
+bg_color = Color(0.55, 0.12, 0.12, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_left = 10
+corner_radius_bottom_right = 10
 
 [node name="GiveUpScreen" type="CanvasLayer"]
 layer = 10
 script = ExtResource("1")
 
-[node name="Background" type="Panel" parent="."]
-anchors_preset = 15
+[node name="Banner" type="Panel" parent="."]
+anchor_left = 0.0
 anchor_right = 1.0
+anchor_top = 1.0
 anchor_bottom = 1.0
+offset_top = -90.0
+offset_bottom = 0.0
 theme_override_styles/panel = SubResource("1")
 
-[node name="CenterContainer" type="CenterContainer" parent="Background"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Background/CenterContainer"]
-layout_mode = 2
-custom_minimum_size = Vector2(480, 0)
-alignment = 1
-theme_override_constants/separation = 16
-
-[node name="Card" type="Panel" parent="Background/CenterContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_styles/panel = SubResource("2")
-
-[node name="VBoxInner" type="VBoxContainer" parent="Background/CenterContainer/VBoxContainer/Card"]
+[node name="HBoxContainer" type="HBoxContainer" parent="Banner"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = 24.0
-offset_right = -24.0
-offset_bottom = -24.0
-theme_override_constants/separation = 16
+offset_left = 20.0
+offset_right = -20.0
+theme_override_constants/separation = 20
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="Background/CenterContainer/VBoxContainer/Card/VBoxInner"]
+[node name="Label" type="Label" parent="Banner/HBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "No solution exists!"
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="SolutionLabel" type="Label" parent="Background/CenterContainer/VBoxContainer/Card/VBoxInner"]
-layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 28
-text = ""
+theme_override_colors/font_color = Color(1, 0.85, 0.85, 1)
+text = "No solution exists for this hand!"
 horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="ScoreLabel" type="Label" parent="Background/CenterContainer/VBoxContainer/Card/VBoxInner"]
+[node name="NextRoundButton" type="Button" parent="Banner/HBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Score: 0"
-horizontal_alignment = 1
-
-[node name="NextRoundButton" type="Button" parent="Background/CenterContainer/VBoxContainer/Card/VBoxInner"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
+custom_minimum_size = Vector2(160, 55)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("2")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 text = "Next Round"
 
-[connection signal="pressed" from="Background/CenterContainer/VBoxContainer/Card/VBoxInner/NextRoundButton" to="." method="_on_next_round_pressed"]
+[connection signal="pressed" from="Banner/HBoxContainer/NextRoundButton" to="." method="_on_next_round_pressed"]

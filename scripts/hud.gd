@@ -18,7 +18,7 @@ func _on_round_started(_cards: Array) -> void:
 func _on_score_changed() -> void:
 	score_label.text = "Score: %d" % GameManager.score
 
-func _on_game_given_up(_solvable: bool, _solution: String) -> void:
+func _on_game_given_up(_solvable: bool, _steps: Array) -> void:
 	score_label.text = "Score: %d" % GameManager.score
 	give_up_button.disabled = true
 

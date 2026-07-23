@@ -1,26 +1,17 @@
 extends CanvasLayer
 
-@onready var title_label: Label = $Background/CenterContainer/VBoxContainer/Card/VBoxInner/TitleLabel
-@onready var solution_label: Label = $Background/CenterContainer/VBoxContainer/Card/VBoxInner/SolutionLabel
-@onready var score_label: Label = $Background/CenterContainer/VBoxContainer/Card/VBoxInner/ScoreLabel
-
 func _ready() -> void:
 	hide()
 	GameManager.game_given_up.connect(_on_game_given_up)
 
-func _on_game_given_up(solvable: bool, solution: String) -> void:
+func _on_game_given_up(solvable: bool, _steps: Array) -> void:
 	if solvable:
-		title_label.text = "You could have solved it!  −2 points"
-		solution_label.text = solution
-		solution_label.visible = true
-	else:
-		title_label.text = "No solution exists for this hand!"
-		solution_label.visible = false
-	score_label.text = "Score: %d" % GameManager.score
-	$Background.modulate.a = 0.0
+		return  # main.gd handles solvable case with card animation
+	# Slide the banner up from the bottom
+	$Banner.position.y = $Banner.size.y
 	show()
 	var tween := create_tween()
-	tween.tween_property($Background, "modulate:a", 1.0, 0.35).set_ease(Tween.EASE_OUT)
+	tween.tween_property($Banner, "position:y", 0.0, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 
 func _on_next_round_pressed() -> void:
 	hide()
