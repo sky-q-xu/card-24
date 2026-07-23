@@ -56,6 +56,12 @@ func _auto_solve_animation(steps: Array) -> void:
 	# Cancel any in-progress operator selection
 	_merge_resolved.emit("")
 	operator_bar.deactivate()
+	# Immediately stop all card physics so nothing goes flying
+	for card in _live_cards:
+		card.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+		card.freeze = true
+		card.linear_velocity = Vector2.ZERO
+		card.angular_velocity = 0.0
 
 	for step in steps:
 		if not _auto_solving:
