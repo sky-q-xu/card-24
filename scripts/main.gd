@@ -17,8 +17,7 @@ var _discard_count: int = 0
 var _discard_pile_cards: Array = []  # card nodes kept alive in the pile display
 
 const DISCARD_MAX_VISIBLE := 3
-const DISCARD_CARD_SCALE := Vector2(0.55, 0.55)
-const DISCARD_STACK_OFFSET := Vector2(4.0, 4.0)
+const DISCARD_STACK_OFFSET := Vector2(5.0, 5.0)
 
 signal _merge_resolved(op: String)
 
@@ -190,7 +189,6 @@ func _animate_to_discard(card: Card, delay: float) -> void:
 		tween.tween_interval(delay)
 	tween.tween_property(card, "global_position", dest, 0.30) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(card, "scale", DISCARD_CARD_SCALE, 0.30)
 	tween.parallel().tween_property(card, "rotation", 0.0, 0.20)
 	tween.tween_callback(func(): _land_in_pile(card))
 
