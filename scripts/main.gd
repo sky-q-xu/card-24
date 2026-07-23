@@ -51,6 +51,20 @@ func _find_card_with_value(val: float, exclude: Card = null) -> Card:
 			return card
 	return null
 
+func _spawn_leaves_from_data(data: Dictionary, pos: Vector2) -> Array:
+	if not data.get("is_merged", false):
+		var c: Card = CARD_SCENE.instantiate()
+		c.setup(float(data["value"]), data["display"], data.get("suit", 0))
+		c.global_position = pos
+		c.input_enabled = false
+		c.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+		c.freeze = true
+		return [c]
+	var leaves: Array = []
+	leaves.append_array(_spawn_leaves_from_data(data["merge_tgt_data"], data["merge_tgt_pos"]))
+	leaves.append_array(_spawn_leaves_from_data(data["merge_src_data"], data["merge_src_pos"]))
+	return leaves
+
 func _auto_solve_animation(steps: Array) -> void:
 	_auto_solving = true
 	_set_cards_interactive(false)
@@ -63,6 +77,17 @@ func _auto_solve_animation(steps: Array) -> void:
 		card.freeze = true
 		card.linear_velocity = Vector2.ZERO
 		card.angular_velocity = 0.0
+
+	# Silently decompose any already-merged cards back to their leaf cards so the
+	# solver steps (which use the original 4 values) can find them on the board.
+	var merged_snapshot: Array = _live_cards.filter(func(c: Card): return c.is_merged)
+	for mc in merged_snapshot:
+		var leaf_nodes := _spawn_leaves_from_data(_card_data(mc), mc.global_position)
+		_live_cards.erase(mc)
+		mc.queue_free()
+		for leaf in leaf_nodes:
+			add_child(leaf)
+			_live_cards.append(leaf)
 
 	for step in steps:
 		if not _auto_solving:
