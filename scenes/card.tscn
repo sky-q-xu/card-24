@@ -13,6 +13,7 @@ friction = 0.0
 script = ExtResource("1")
 gravity_scale = 0.0
 linear_damp = 1.5
+continuous_cd = 1
 physics_material_override = SubResource("2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

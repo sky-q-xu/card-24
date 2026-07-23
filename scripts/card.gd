@@ -251,7 +251,7 @@ func _input(event: InputEvent) -> void:
 						return
 					freeze = false
 					$CollisionShape2D.disabled = false
-					linear_velocity = _tracked_velocity
+					linear_velocity = _tracked_velocity.limit_length(1400.0)
 					_check_drop()
 
 	if event is InputEventMouseMotion and _dragging:
