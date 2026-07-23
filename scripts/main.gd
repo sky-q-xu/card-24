@@ -24,11 +24,12 @@ func _ready() -> void:
 
 func _create_walls() -> void:
 	var vp := get_viewport_rect().size
+	const T := 200.0  # thick enough that no card can tunnel through in one frame
 	var walls := [
-		[Vector2(-10, vp.y * 0.5), Vector2(20, vp.y + 40)],   # left
-		[Vector2(vp.x + 10, vp.y * 0.5), Vector2(20, vp.y + 40)],  # right
-		[Vector2(vp.x * 0.5, -10), Vector2(vp.x + 40, 20)],   # top
-		[Vector2(vp.x * 0.5, vp.y + 10), Vector2(vp.x + 40, 20)],  # bottom
+		[Vector2(-T * 0.5, vp.y * 0.5), Vector2(T, vp.y + T * 2)],        # left
+		[Vector2(vp.x + T * 0.5, vp.y * 0.5), Vector2(T, vp.y + T * 2)],  # right
+		[Vector2(vp.x * 0.5, -T * 0.5), Vector2(vp.x + T * 2, T)],        # top
+		[Vector2(vp.x * 0.5, vp.y + T * 0.5), Vector2(vp.x + T * 2, T)],  # bottom
 	]
 	for w in walls:
 		var sb := StaticBody2D.new()

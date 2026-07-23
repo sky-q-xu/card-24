@@ -275,6 +275,20 @@ func _clamp_drag_to_walls() -> void:
 		pos.y = clampf(pos.y, 0.0, vp.y - CARD_H)
 	global_position = pos
 
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	if _dragging:
+		return
+	var vp := get_viewport_rect().size
+	var pos := state.transform.origin
+	# Emergency clamp: snap escaped cards back into the viewport
+	var escape_margin := 50.0
+	if pos.x < -escape_margin or pos.x > vp.x + escape_margin \
+			or pos.y < -escape_margin or pos.y > vp.y + escape_margin:
+		var safe_x := clampf(pos.x, 0.0, vp.x - CARD_W)
+		var safe_y := clampf(pos.y, 0.0, vp.y - CARD_H)
+		state.transform = Transform2D(state.transform.get_rotation(), Vector2(safe_x, safe_y))
+		state.linear_velocity = Vector2.ZERO
+
 func _check_drop() -> void:
 	for area in $Area2D.get_overlapping_areas():
 		var target = area.get_parent()
