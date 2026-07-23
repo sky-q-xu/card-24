@@ -13,6 +13,7 @@ const JITTER_ROT := 0.12
 
 var _live_cards: Array = []
 var _auto_solving: bool = false
+var _discard_count: int = 0
 
 signal _merge_resolved(op: String)
 
@@ -172,11 +173,36 @@ func _auto_solve_animation(steps: Array) -> void:
 		_auto_solving = false
 		GameManager.deal_new_round()
 
+func _animate_to_discard(card: Card, delay: float) -> void:
+	card.input_enabled = false
+	card.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
+	card.freeze = true
+	card.linear_velocity = Vector2.ZERO
+	card.angular_velocity = 0.0
+	var dest: Vector2 = $GameBoard/DiscardPile.global_position
+	var tween := create_tween()
+	if delay > 0.0:
+		tween.tween_interval(delay)
+	tween.tween_property(card, "global_position", dest, 0.30) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(card, "scale", Vector2(0.5, 0.5), 0.30)
+	tween.parallel().tween_property(card, "rotation", 0.0, 0.20)
+	tween.tween_callback(card.queue_free)
+
+func _update_discard_pile() -> void:
+	$GameBoard/DiscardPile/Layer0.visible = _discard_count >= 1
+	$GameBoard/DiscardPile/Layer1.visible = _discard_count >= 2
+	$GameBoard/DiscardPile/Layer2.visible = _discard_count >= 3
+	var lbl: Label = $GameBoard/DiscardPile/CountLabel
+	lbl.text = str(_discard_count) if _discard_count > 0 else ""
+
 func _on_round_started(card_data: Array) -> void:
 	_auto_solving = false
-	for card in _live_cards:
-		card.queue_free()
+	_discard_count += _live_cards.size()
+	for i in _live_cards.size():
+		_animate_to_discard(_live_cards[i], i * 0.06)
 	_live_cards.clear()
+	_update_discard_pile()
 	var slots := _card_slots.get_children()
 	for i in range(card_data.size()):
 		var c: Card = CARD_SCENE.instantiate()

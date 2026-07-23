@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/operator_bar.tscn" id="2"]
@@ -30,6 +30,18 @@ corner_radius_top_left = 28
 corner_radius_top_right = 28
 corner_radius_bottom_left = 28
 corner_radius_bottom_right = 28
+
+[sub_resource type="StyleBoxFlat" id="8"]
+bg_color = Color(0.85, 0.85, 0.85, 0.18)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.5, 0.5, 0.35)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_left = 16
+corner_radius_bottom_right = 16
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
@@ -84,6 +96,45 @@ theme_override_styles/panel = SubResource("6")
 offset_right = 120.0
 offset_bottom = 180.0
 theme_override_styles/panel = SubResource("6")
+
+[node name="DiscardPile" type="Node2D" parent="GameBoard"]
+position = Vector2(70, 415)
+
+[node name="EmptySlot" type="Panel" parent="GameBoard/DiscardPile"]
+offset_right = 120.0
+offset_bottom = 180.0
+theme_override_styles/panel = SubResource("8")
+
+[node name="Layer2" type="Panel" parent="GameBoard/DiscardPile"]
+visible = false
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 130.0
+offset_bottom = 190.0
+theme_override_styles/panel = SubResource("6")
+
+[node name="Layer1" type="Panel" parent="GameBoard/DiscardPile"]
+visible = false
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 125.0
+offset_bottom = 185.0
+theme_override_styles/panel = SubResource("6")
+
+[node name="Layer0" type="Panel" parent="GameBoard/DiscardPile"]
+visible = false
+offset_right = 120.0
+offset_bottom = 180.0
+theme_override_styles/panel = SubResource("6")
+
+[node name="CountLabel" type="Label" parent="GameBoard/DiscardPile"]
+offset_top = 185.0
+offset_right = 120.0
+offset_bottom = 215.0
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.35, 0.28, 0.20, 1)
+horizontal_alignment = 1
+text = ""
 
 [node name="OperatorBar" parent="." instance=ExtResource("2")]
 
