@@ -105,28 +105,6 @@ offset_right = 120.0
 offset_bottom = 180.0
 theme_override_styles/panel = SubResource("8")
 
-[node name="Layer2" type="Panel" parent="GameBoard/DiscardPile"]
-visible = false
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 130.0
-offset_bottom = 190.0
-theme_override_styles/panel = SubResource("6")
-
-[node name="Layer1" type="Panel" parent="GameBoard/DiscardPile"]
-visible = false
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 125.0
-offset_bottom = 185.0
-theme_override_styles/panel = SubResource("6")
-
-[node name="Layer0" type="Panel" parent="GameBoard/DiscardPile"]
-visible = false
-offset_right = 120.0
-offset_bottom = 180.0
-theme_override_styles/panel = SubResource("6")
-
 [node name="CountLabel" type="Label" parent="GameBoard/DiscardPile"]
 offset_top = 185.0
 offset_right = 120.0

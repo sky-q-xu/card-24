@@ -14,6 +14,11 @@ const JITTER_ROT := 0.12
 var _live_cards: Array = []
 var _auto_solving: bool = false
 var _discard_count: int = 0
+var _discard_pile_cards: Array = []  # card nodes kept alive in the pile display
+
+const DISCARD_MAX_VISIBLE := 3
+const DISCARD_CARD_SCALE := Vector2(0.55, 0.55)
+const DISCARD_STACK_OFFSET := Vector2(4.0, 4.0)
 
 signal _merge_resolved(op: String)
 
@@ -185,14 +190,33 @@ func _animate_to_discard(card: Card, delay: float) -> void:
 		tween.tween_interval(delay)
 	tween.tween_property(card, "global_position", dest, 0.30) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(card, "scale", Vector2(0.5, 0.5), 0.30)
+	tween.parallel().tween_property(card, "scale", DISCARD_CARD_SCALE, 0.30)
 	tween.parallel().tween_property(card, "rotation", 0.0, 0.20)
-	tween.tween_callback(card.queue_free)
+	tween.tween_callback(func(): _land_in_pile(card))
+
+func _land_in_pile(card: Card) -> void:
+	if not is_instance_valid(card):
+		return
+	_discard_pile_cards.append(card)
+	# Trim oldest cards beyond the visible limit
+	while _discard_pile_cards.size() > DISCARD_MAX_VISIBLE:
+		var oldest: Card = _discard_pile_cards.pop_front()
+		if is_instance_valid(oldest):
+			oldest.queue_free()
+	_restack_discard_pile()
+
+func _restack_discard_pile() -> void:
+	var base: Vector2 = $GameBoard/DiscardPile.global_position
+	var n := _discard_pile_cards.size()
+	for i in n:
+		var card: Card = _discard_pile_cards[i]
+		if not is_instance_valid(card):
+			continue
+		var depth := n - 1 - i  # 0 = top/newest, n-1 = bottom/oldest
+		card.global_position = base + DISCARD_STACK_OFFSET * depth
+		card.z_index = i + 1
 
 func _update_discard_pile() -> void:
-	$GameBoard/DiscardPile/Layer0.visible = _discard_count >= 1
-	$GameBoard/DiscardPile/Layer1.visible = _discard_count >= 2
-	$GameBoard/DiscardPile/Layer2.visible = _discard_count >= 3
 	var lbl: Label = $GameBoard/DiscardPile/CountLabel
 	lbl.text = str(_discard_count) if _discard_count > 0 else ""
 
