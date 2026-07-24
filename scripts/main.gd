@@ -224,14 +224,24 @@ func _update_discard_pile() -> void:
 
 func _on_round_started(card_data: Array) -> void:
 	_auto_solving = false
+	# Cancel any open operator selection
+	_merge_resolved.emit("")
+	operator_bar.deactivate()
 	# Kill any deal animations still running so their callbacks can't fire on freed cards
 	for t in _active_deal_tweens:
 		if t:
 			t.kill()
 	_active_deal_tweens.clear()
-	_discard_count += _live_cards.size()
-	for i in _live_cards.size():
-		_animate_to_discard(_live_cards[i], i * 0.06)
+	# Only animate cards that were fully on the board; free mid-deal cards immediately
+	var deck_pos: Vector2 = _deck.global_position
+	var discard_delay := 0.0
+	for card in _live_cards:
+		if card.global_position.distance_to(deck_pos) < 80.0:
+			card.queue_free()  # still at/near deck, never made it to the board
+		else:
+			_discard_count += 1
+			_animate_to_discard(card, discard_delay)
+			discard_delay += 0.06
 	_live_cards.clear()
 	_update_discard_pile()
 	var slots := _card_slots.get_children()
@@ -248,6 +258,9 @@ func _on_round_started(card_data: Array) -> void:
 		add_child(c)
 		_live_cards.append(c)
 		_animate_deal(c, slots[i].global_position, i)
+	# Notify GameManager once the last card finishes dealing
+	if not _active_deal_tweens.is_empty():
+		_active_deal_tweens.back().tween_callback(func(): GameManager.notify_deal_complete())
 
 const FLIP_DURATION := 0.12
 

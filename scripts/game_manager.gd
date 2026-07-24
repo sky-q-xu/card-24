@@ -11,8 +11,15 @@ var cards: Array = []
 var round: int = 1
 var score: int = 0
 var _round_values: Array = []
+var _round_transitioning: bool = false
+
+func notify_deal_complete() -> void:
+	_round_transitioning = false
 
 func deal_new_round(increment_round: bool = true) -> void:
+	if _round_transitioning:
+		return
+	_round_transitioning = true
 	var vals := _pick_four()
 	if ensure_solvable:
 		var tries := 0
