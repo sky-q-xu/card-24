@@ -250,7 +250,7 @@ func _on_round_started(card_data: Array) -> void:
 		c.setup(card_data[i].value, card_data[i].display, card_data[i].suit)
 		c.set_face_down()
 		c.global_position = _deck.global_position
-		c.scale = Vector2(0.6, 0.6)
+		c.scale = Vector2.ONE
 		c.input_enabled = false
 		c.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
 		c.freeze = true
@@ -274,8 +274,6 @@ func _animate_deal(card: Card, target_position: Vector2, index: int) -> void:
 	_active_deal_tweens.append(tween)
 	tween.tween_interval(index * DEAL_STAGGER)
 	tween.tween_property(card, "global_position", final_pos, DEAL_DURATION) \
-		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.parallel().tween_property(card, "scale", Vector2.ONE, DEAL_DURATION) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tween.parallel().tween_property(card, "rotation", final_rot, DEAL_DURATION) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
