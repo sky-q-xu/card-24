@@ -46,14 +46,13 @@ func _make_style(color: Color) -> StyleBoxFlat:
 	s.corner_radius_top_right = 16
 	s.corner_radius_bottom_left = 16
 	s.corner_radius_bottom_right = 16
+	s.border_width_left = 2; s.border_width_top = 2
+	s.border_width_right = 2; s.border_width_bottom = 2
+	s.border_color = Color(0, 0, 0, 0.65)
 	return s
 
 func _make_card_style(v: float) -> StyleBoxFlat:
-	var s := _make_style(_color_for_value(v))
-	s.border_width_left = 2; s.border_width_top = 2
-	s.border_width_right = 2; s.border_width_bottom = 2
-	s.border_color = Color(0, 0, 0, 0.25)
-	return s
+	return _make_style(_color_for_value(v))
 
 func _make_merged_style() -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
@@ -83,7 +82,7 @@ func set_face_down() -> void:
 	$Panel/BottomLabel.visible = false
 
 func reveal_face() -> void:
-	$Panel.add_theme_stylebox_override("panel", _make_style(_color_for_value(value)))
+	$Panel.add_theme_stylebox_override("panel", _make_card_style(value))
 	$Panel/TopLabel.visible = true
 	$Panel/BottomLabel.visible = true
 
