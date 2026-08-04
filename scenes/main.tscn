@@ -1,11 +1,23 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene format=3 uid="uid://c5kai8wyp7pmh"]
 
-[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="Script" uid="uid://4rowgqc2krih" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/operator_bar.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://bj05n3a5mqu1q" path="res://scenes/hud.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/screens/win_screen.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/screens/lose_screen.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://scenes/screens/give_up_screen.tscn" id="6"]
+
+[sub_resource type="StyleBoxFlat" id="7"]
+bg_color = Color(0.92, 0.9, 0.86, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.24, 0.18, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
 
 [sub_resource type="StyleBoxFlat" id="6"]
 bg_color = Color(1, 1, 1, 1)
@@ -16,20 +28,8 @@ border_width_bottom = 2
 border_color = Color(0.15, 0.15, 0.15, 1)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
-corner_radius_bottom_left = 16
 corner_radius_bottom_right = 16
-
-[sub_resource type="StyleBoxFlat" id="7"]
-bg_color = Color(0.92, 0.90, 0.86, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.30, 0.24, 0.18, 1)
-corner_radius_top_left = 28
-corner_radius_top_right = 28
-corner_radius_bottom_left = 28
-corner_radius_bottom_right = 28
+corner_radius_bottom_left = 16
 
 [sub_resource type="StyleBoxFlat" id="8"]
 bg_color = Color(0.85, 0.85, 0.85, 0.18)
@@ -40,17 +40,17 @@ border_width_bottom = 2
 border_color = Color(0.5, 0.5, 0.5, 0.35)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
-corner_radius_bottom_left = 16
 corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=14108920]
 script = ExtResource("1")
 
-[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=1834076352]
 layer = -1
 
-[node name="Background" type="Panel" parent="BackgroundLayer"]
-layout_mode = 1
+[node name="Background" type="Panel" parent="BackgroundLayer" unique_id=340168364]
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 20.0
@@ -59,71 +59,71 @@ offset_right = -20.0
 offset_bottom = -12.0
 theme_override_styles/panel = SubResource("7")
 
-[node name="GameBoard" type="Node2D" parent="."]
+[node name="GameBoard" type="Node2D" parent="." unique_id=277816719]
 
-[node name="CardSlots" type="Node2D" parent="GameBoard"]
+[node name="CardSlots" type="Node2D" parent="GameBoard" unique_id=804606056]
 
-[node name="Slot0" type="Marker2D" parent="GameBoard/CardSlots"]
+[node name="Slot0" type="Marker2D" parent="GameBoard/CardSlots" unique_id=1866189957]
 position = Vector2(246, 225)
 
-[node name="Slot1" type="Marker2D" parent="GameBoard/CardSlots"]
+[node name="Slot1" type="Marker2D" parent="GameBoard/CardSlots" unique_id=1764608213]
 position = Vector2(426, 225)
 
-[node name="Slot2" type="Marker2D" parent="GameBoard/CardSlots"]
+[node name="Slot2" type="Marker2D" parent="GameBoard/CardSlots" unique_id=399212370]
 position = Vector2(606, 225)
 
-[node name="Slot3" type="Marker2D" parent="GameBoard/CardSlots"]
+[node name="Slot3" type="Marker2D" parent="GameBoard/CardSlots" unique_id=735598947]
 position = Vector2(786, 225)
 
-[node name="Deck" type="Node2D" parent="GameBoard"]
-position = Vector2(975, 435)
+[node name="Deck" type="Node2D" parent="GameBoard" unique_id=1370358281]
+position = Vector2(975, 365)
 
-[node name="Layer2" type="Panel" parent="GameBoard/Deck"]
+[node name="Layer2" type="Panel" parent="GameBoard/Deck" unique_id=1037053738]
 offset_left = 10.0
 offset_top = 10.0
 offset_right = 130.0
 offset_bottom = 190.0
 theme_override_styles/panel = SubResource("6")
 
-[node name="Layer1" type="Panel" parent="GameBoard/Deck"]
+[node name="Layer1" type="Panel" parent="GameBoard/Deck" unique_id=685819394]
 offset_left = 5.0
 offset_top = 5.0
 offset_right = 125.0
 offset_bottom = 185.0
 theme_override_styles/panel = SubResource("6")
 
-[node name="Layer0" type="Panel" parent="GameBoard/Deck"]
+[node name="Layer0" type="Panel" parent="GameBoard/Deck" unique_id=48246479]
 offset_right = 120.0
 offset_bottom = 180.0
 theme_override_styles/panel = SubResource("6")
 
-[node name="DiscardPile" type="Node2D" parent="GameBoard"]
-position = Vector2(70, 415)
+[node name="DiscardPile" type="Node2D" parent="GameBoard" unique_id=2124266396]
+position = Vector2(70, 375)
 
-[node name="EmptySlot" type="Panel" parent="GameBoard/DiscardPile"]
+[node name="EmptySlot" type="Panel" parent="GameBoard/DiscardPile" unique_id=641467980]
 offset_right = 120.0
 offset_bottom = 180.0
 theme_override_styles/panel = SubResource("8")
 
-[node name="CountLabel" type="Label" parent="GameBoard/DiscardPile"]
+[node name="CountLabel" type="Label" parent="GameBoard/DiscardPile" unique_id=1258828959]
+visible = false
 offset_top = 185.0
 offset_right = 120.0
 offset_bottom = 215.0
+theme_override_colors/font_color = Color(0.35, 0.28, 0.2, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.35, 0.28, 0.20, 1)
 horizontal_alignment = 1
-text = ""
 
-[node name="OperatorBar" parent="." instance=ExtResource("2")]
+[node name="OperatorBar" parent="." unique_id=688223581 instance=ExtResource("2")]
 
-[node name="HUD" parent="." instance=ExtResource("3")]
+[node name="HUD" parent="." unique_id=279571838 instance=ExtResource("3")]
 
-[node name="WinScreen" parent="." instance=ExtResource("4")]
+[node name="WinScreen" parent="." unique_id=249563921 instance=ExtResource("4")]
 offset = Vector2(-550, -200)
 transform = Transform2D(1, 0, 0, 1, -550, -200)
 
-[node name="LoseScreen" parent="." instance=ExtResource("5")]
+[node name="LoseScreen" parent="." unique_id=1024498772 instance=ExtResource("5")]
 offset = Vector2(-550, -200)
 transform = Transform2D(1, 0, 0, 1, -550, -200)
 
-[node name="GiveUpScreen" parent="." instance=ExtResource("6")]
+[node name="GiveUpScreen" parent="." unique_id=1088034401 instance=ExtResource("6")]

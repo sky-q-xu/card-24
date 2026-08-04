@@ -86,6 +86,25 @@ func reveal_face() -> void:
 	$Panel/TopLabel.visible = true
 	$Panel/BottomLabel.visible = true
 
+func collapse_to_face_up() -> void:
+	if not is_merged:
+		return
+	# Merged cards have their origin at the visual center; restore top-left origin.
+	global_position -= Vector2(CARD_W * 0.5, CARD_H * 0.5)
+	is_merged = false
+	$StackLayer0.visible = false
+	$StackLayer1.visible = false
+	$StackLayer2.visible = false
+	$StackLayer3.visible = false
+	$Panel/BarLabel.visible = false
+	$Panel.offset_left   = 0.0
+	$Panel.offset_top    = 0.0
+	$Panel.offset_right  = CARD_W
+	$Panel.offset_bottom = CARD_H
+	$Panel.add_theme_stylebox_override("panel", _make_card_style(value))
+	$Panel/TopLabel.visible = true
+	$Panel/BottomLabel.visible = true
+
 func get_center() -> Vector2:
 	if is_merged:
 		return global_position
@@ -183,20 +202,20 @@ func _color_for_value(v: float) -> Color:
 		var hue := fmod(absf(v) * 0.618033988749, 1.0)
 		return Color.from_hsv(hue, 0.55, 0.88)
 	match int(roundf(v)):
-		1:  return Color(1.0, 0.85, 0.3)
-		2:  return Color(0.5, 0.85, 0.5)
-		3:  return Color(1.0, 0.5,  0.4)
-		4:  return Color(0.4, 0.7,  1.0)
-		5:  return Color(0.75, 0.5, 1.0)
-		6:  return Color(0.3, 0.8,  0.8)
+		1:  return Color(1.0, 0.0, 0.302, 1.0)
+		2:  return Color(0.95, 0.491, 0.0, 1.0)
+		3:  return Color(1.0, 0.928, 0.14, 1.0)
+		4:  return Color(0.344, 0.84, 0.344, 1.0)
+		5:  return Color(0.5, 0.975, 1.0, 1.0)
+		6:  return Color(0.59, 0.296, 0.8, 1.0)
 		7:  return Color(1.0, 0.6,  0.8)
-		8:  return Color(0.15, 0.2, 0.53)
-		9:  return Color(1.0, 0.65, 0.3)
-		10: return Color(0.6, 0.9,  0.4)
-		11: return Color(1.0, 0.4,  0.8)
-		12: return Color(0.125, 0.55, 0.55)
-		13: return Color(0.9, 0.3,  0.3)
-		24: return Color(1.0, 0.9,  0.0)
+		8:  return Color(0.304, 0.227, 0.178, 1.0)
+		9:  return Color(0.47, 0.47, 0.47, 1.0)
+		10: return Color(0.233, 0.25, 0.672, 1.0)
+		11: return Color(1.0, 0.37, 0.622, 1.0)
+		12: return Color(0.184, 0.8, 0.8, 1.0)
+		13: return Color(0.35, 0.115, 0.115, 1.0)
+		24: return Color(0.033, 1.0, 0.0, 1.0)
 		_:
 			var hue := fmod(absf(roundf(v)) * 0.618033988749, 1.0)
 			return Color.from_hsv(hue, 0.55, 0.88)

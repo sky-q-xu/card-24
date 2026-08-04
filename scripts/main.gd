@@ -25,6 +25,7 @@ signal _merge_resolved(op: String)
 func _ready() -> void:
 	GameManager.round_started.connect(_on_round_started)
 	GameManager.game_given_up.connect(_on_game_given_up)
+	GameManager.game_won.connect(_on_game_won)
 	GameManager.deal_new_round(false)
 	_create_walls()
 
@@ -46,6 +47,14 @@ func _create_walls() -> void:
 		cs.shape = rect
 		sb.add_child(cs)
 		add_child(sb)
+
+func _on_game_won() -> void:
+	# Win screen covers the board, so free the winning card now so it doesn't
+	# get sent to the discard pile when the next round starts.
+	for card in _live_cards:
+		if is_instance_valid(card):
+			card.queue_free()
+	_live_cards.clear()
 
 func _on_game_given_up(solvable: bool, steps: Array) -> void:
 	if solvable:
@@ -172,10 +181,25 @@ func _auto_solve_animation(steps: Array) -> void:
 		if not _auto_solving:
 			return
 
-	# Pause so the player can see the final result, then start next round
+	# Pause so the player can see the final result, then start next round.
+	# Replace merged cards with their leaf cards so individual face-up cards
+	# (not the merged "24" stack) fly to the discard pile.
 	await get_tree().create_timer(2.0).timeout
 	if _auto_solving:
 		_auto_solving = false
+		var new_live: Array = []
+		for card in _live_cards:
+			if not is_instance_valid(card):
+				continue
+			if card.is_merged:
+				var leaves := _spawn_leaves_from_data(_card_data(card), card.global_position)
+				for leaf in leaves:
+					add_child(leaf)
+					new_live.append(leaf)
+				card.queue_free()
+			else:
+				new_live.append(card)
+		_live_cards = new_live
 		GameManager.deal_new_round()
 
 func _animate_to_discard(card: Card, delay: float) -> void:
@@ -184,9 +208,9 @@ func _animate_to_discard(card: Card, delay: float) -> void:
 	card.freeze = true
 	card.linear_velocity = Vector2.ZERO
 	card.angular_velocity = 0.0
-	# Prevent discarded cards from triggering drop events or physics collisions
 	card.get_node("CollisionShape2D").disabled = true
 	card.get_node("Area2D").monitoring = false
+	card.get_node("Area2D").monitorable = false
 	var dest: Vector2 = $GameBoard/DiscardPile.global_position
 	var tween := create_tween()
 	if delay > 0.0:
@@ -232,12 +256,26 @@ func _on_round_started(card_data: Array) -> void:
 		if t:
 			t.kill()
 	_active_deal_tweens.clear()
-	# Only animate cards that were fully on the board; free mid-deal cards immediately
+	# Decompose merged cards to their original leaf cards first so plain face-up
+	# cards go to the discard pile — never a merged stack visual.
 	var deck_pos: Vector2 = _deck.global_position
 	var discard_delay := 0.0
 	for card in _live_cards:
+		if not is_instance_valid(card):
+			continue
 		if card.global_position.distance_to(deck_pos) < 80.0:
 			card.queue_free()  # still at/near deck, never made it to the board
+		elif card.is_merged:
+			var leaves := _spawn_leaves_from_data(_card_data(card), card.global_position)
+			card.queue_free()
+			for leaf in leaves:
+				add_child(leaf)
+				if leaf.global_position.distance_to(deck_pos) < 80.0:
+					leaf.queue_free()
+				else:
+					_discard_count += 1
+					_animate_to_discard(leaf, discard_delay)
+					discard_delay += 0.06
 		else:
 			_discard_count += 1
 			_animate_to_discard(card, discard_delay)
@@ -382,8 +420,10 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	await unfold.finished
 
-	merged.freeze = false
-	merged.input_enabled = true
+	# _on_game_won/_on_game_lost may have freed merged already; guard before touching it.
+	if is_instance_valid(merged):
+		merged.freeze = false
+		merged.input_enabled = true
 	_set_cards_interactive(true)
 
 func _on_card_unmerged(merged: Card) -> void:

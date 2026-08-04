@@ -28,6 +28,8 @@ func _on_new_deal_pressed() -> void:
 func _on_solvable_toggled() -> void:
 	GameManager.ensure_solvable = !GameManager.ensure_solvable
 	solvable_toggle.text = "Solvable: ON" if GameManager.ensure_solvable else "Solvable: OFF"
+	if GameManager.ensure_solvable:
+		GameManager.deal_new_round(false)
 
 func _on_give_up_pressed() -> void:
 	GameManager.give_up()
