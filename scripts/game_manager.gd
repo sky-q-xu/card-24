@@ -50,6 +50,8 @@ func give_up() -> void:
 	var solvable := steps.size() > 0
 	if solvable:
 		score -= 2
+	else:
+		score += 1
 	emit_signal("game_given_up", solvable, steps)
 
 func _pick_four() -> Array:

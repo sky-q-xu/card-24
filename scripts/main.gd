@@ -338,7 +338,7 @@ func _on_card_dropped_on(source: Card, target: Card) -> void:
 	target.freeze = true
 	target.linear_velocity = Vector2.ZERO
 
-	operator_bar.activate()
+	operator_bar.activate(target.get_center(), self, _live_cards)
 
 	@warning_ignore("confusable_local_declaration")
 	operator_bar.operator_selected.connect(func(op): _merge_resolved.emit(op), CONNECT_ONE_SHOT)
