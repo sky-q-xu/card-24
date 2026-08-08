@@ -20,7 +20,7 @@ const SETTLE_DIST         := 55.0   # close enough to target → activate
 const WAYPOINT_REACH      := 30.0   # close enough to intermediate waypoint → advance
 const TIMEOUT             := 8.0
 const RECALC_INTERVAL     := 0.05   # seconds between full-path recalculations
-const CARD_EDGE_CLEARANCE := 30.0   # px clearance from card edge ← easy to tune
+const CARD_EDGE_CLEARANCE := 100.0   # px clearance from card edge ← easy to tune
 const MAX_SUBDIVIDE_ITERS := 4      # how many times to recursively split blocked segs
 const HUD_CLEARANCE       := 240.0  # px from top to clear the HUD bar ← easy to tune
 
