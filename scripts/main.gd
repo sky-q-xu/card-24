@@ -544,3 +544,4 @@ func _card_index(card: Card) -> int:
 func _set_cards_interactive(enabled: bool) -> void:
 	for card in _live_cards:
 		card.input_enabled = enabled
+		card.input_pickable = enabled

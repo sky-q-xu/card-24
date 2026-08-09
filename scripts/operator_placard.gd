@@ -13,13 +13,18 @@ var _elapsed: float       = 0.0
 var _path: Array          = []   # Array[Vector2] — current planned route
 var _path_idx: int        = 0
 var _recalc_timer: float  = 0.0
+var _stuck_timer: float    = 0.0
+var _stuck_ref_dist: float = INF  # dist_final at start of each check window
 
 const MAX_SPEED           := 400.0  # px/s
+const STEER_STRENGTH      := 20.0   # steering convergence rate (higher = snappier)
 const ARRIVE_DIST         := 80.0   # slow-down radius near final target
 const SETTLE_DIST         := 55.0   # close enough to target → activate
 const WAYPOINT_REACH      := 30.0   # close enough to intermediate waypoint → advance
 const TIMEOUT             := 8.0
 const RECALC_INTERVAL     := 0.05   # seconds between full-path recalculations
+const STUCK_CHECK_INTERVAL := 1.5   # seconds per progress window ← easy to tune
+const STUCK_MIN_PROGRESS  := 15.0   # px closer to target needed per window to not settle
 const CARD_EDGE_CLEARANCE := 100.0   # px clearance from card edge ← easy to tune
 const MAX_SUBDIVIDE_ITERS := 4      # how many times to recursively split blocked segs
 const HUD_CLEARANCE       := 240.0  # px from top to clear the HUD bar ← easy to tune
@@ -45,9 +50,11 @@ func start_seeking(target: Vector2, cards: Array) -> void:
 	_live_cards   = cards
 	_seeking      = true
 	_elapsed      = 0.0
-	_recalc_timer = RECALC_INTERVAL  # trigger immediate calculation
-	_path         = [global_position, target]
-	_path_idx     = 1
+	_recalc_timer  = RECALC_INTERVAL  # trigger immediate calculation
+	_path          = [global_position, target]
+	_path_idx      = 1
+	_stuck_timer   = 0.0
+	_stuck_ref_dist = INF  # first window always passes
 	freeze        = false
 	mass          = 0.05
 	linear_damp   = 0.0
@@ -77,10 +84,27 @@ func _physics_process(delta: float) -> void:
 	var current_wp: Vector2 = _path[_path_idx] if _path_idx < _path.size() else _target_pos
 	var to_wp := current_wp - global_position
 	var dist_final := global_position.distance_to(_target_pos)
-	var speed := MAX_SPEED * minf(dist_final / ARRIVE_DIST, 1.0)
+	var target_speed := MAX_SPEED * minf(dist_final / ARRIVE_DIST, 1.0)
 
 	if to_wp.length() > 0.5:
-		linear_velocity = to_wp.normalized() * speed
+		var desired_vel := to_wp.normalized() * target_speed
+		# Apply a steering force rather than overriding velocity directly.
+		# Multiplying by mass makes the acceleration mass-independent.
+		# Physics engine still processes collisions, so placards can't phase through cards.
+		apply_central_force((desired_vel - linear_velocity) * STEER_STRENGTH * mass)
+
+	# Hard cap so accumulated forces can't exceed MAX_SPEED
+	linear_velocity = linear_velocity.limit_length(MAX_SPEED)
+
+	# Stuck detection: settle if not getting meaningfully closer to target each window.
+	# Catches both "not moving" and "dancing in place without progress".
+	_stuck_timer += delta
+	if _stuck_timer >= STUCK_CHECK_INTERVAL:
+		if dist_final > _stuck_ref_dist - STUCK_MIN_PROGRESS:
+			_arrive()
+			return
+		_stuck_ref_dist = dist_final
+		_stuck_timer    = 0.0
 
 	if dist_final < SETTLE_DIST:
 		_arrive()
